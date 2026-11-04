@@ -186,7 +186,7 @@ export const DEFAULTS = {
   // owns the registry and falls back on an unknown id, so nothing validates it
   // here. `tuneInOverlay` gates the full-bleed tune-in gate; off drops the
   // takeover and listeners start via the skin's own play button.
-  ui: { boothBuddy: false, skin: 'classic', tuneInOverlay: true },
+  ui: { boothBuddy: false, skin: 'enochian', tuneInOverlay: true },
   // Two independent locks over ONE shared password (#478). `privatePlayer` gates
   // the public web pages — UI-level, applies live. `listenerAuth` puts Icecast
   // listener auth on every mount via URL auth calling back into

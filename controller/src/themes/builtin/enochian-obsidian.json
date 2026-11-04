@@ -1,0 +1,24 @@
+{
+  "id": "enochian-obsidian",
+  "name": "Enochian Obsidian",
+  "description": "Matte obsidian surfaces, precise instrument labels and Cinnabar signal controls.",
+  "mode": "dark",
+  "tokens": {
+    "--bg": "#171817",
+    "--surface": "#292a27",
+    "--surface-border": "rgba(239,238,230,0.20)",
+    "--field": "#292a27",
+    "--ink": "#efeee6",
+    "--muted": "#a8a99f",
+    "--ink-faint": "#93958a",
+    "--accent": "#ef6350",
+    "--accent-2": "#ef6350",
+    "--accent-soft": "color-mix(in srgb, #ef6350 12%, #171817)",
+    "--line": "rgba(239,238,230,0.20)",
+    "--soft-border": "rgba(239,238,230,0.20)",
+    "--overlay": "rgba(0,0,0,0.12)",
+    "--display-font": "space-grotesk",
+    "--mono-font": "ibm-plex-mono",
+    "--grain": "0"
+  }
+}

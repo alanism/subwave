@@ -10,7 +10,7 @@ const STATION_CACHE_KEY = 'subwave-skin-station';
 // pre-paint script below. They live HERE, as plain data with no React, because
 // the server layout inlines SKIN_INIT_SCRIPT and must not drag the registry's
 // next/dynamic wrappers into a server component.
-export const DEFAULT_SKIN_ID = 'classic';
+export const DEFAULT_SKIN_ID = 'enochian';
 
 /** Retired ids resolve to their successor so a saved setting survives an
  *  upgrade. */

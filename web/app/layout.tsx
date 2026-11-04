@@ -1,7 +1,7 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { Fraunces, Plus_Jakarta_Sans, JetBrains_Mono, Doto, Space_Grotesk, Instrument_Serif, IBM_Plex_Mono, Space_Mono, Fira_Code, Anton, Chakra_Petch, Saira_Stencil, VT323, Bricolage_Grotesque, Courier_Prime, Overpass_Mono, DM_Mono } from 'next/font/google';
+import { Fraunces, IBM_Plex_Sans, JetBrains_Mono, Doto, Space_Grotesk, Instrument_Serif, IBM_Plex_Mono, Space_Mono, Fira_Code, Anton, Chakra_Petch, Saira_Stencil, VT323, Bricolage_Grotesque, Courier_Prime, Overpass_Mono, DM_Mono } from 'next/font/google';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { THEME_INIT_SCRIPT } from '@/lib/theme';
 import { LITE_INIT_SCRIPT } from '@/lib/lite';
@@ -86,7 +86,7 @@ const bricolageGrotesque = Bricolage_Grotesque({
   variable: '--font-bricolage-grotesque',
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
+const ibmPlexSans = IBM_Plex_Sans({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
@@ -210,7 +210,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} ${doto.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${anton.variable} ${chakraPetch.variable} ${sairaStencilOne.variable} ${vt323.variable} ${bricolageGrotesque.variable} ${ibmPlexMono.variable} ${spaceMono.variable} ${firaCode.variable} ${courierPrime.variable} ${overpassMono.variable} ${dmMono.variable}`}
+      className={`${fraunces.variable} ${ibmPlexSans.variable} ${jetbrainsMono.variable} ${doto.variable} ${spaceGrotesk.variable} ${instrumentSerif.variable} ${anton.variable} ${chakraPetch.variable} ${sairaStencilOne.variable} ${vt323.variable} ${bricolageGrotesque.variable} ${ibmPlexMono.variable} ${spaceMono.variable} ${firaCode.variable} ${courierPrime.variable} ${overpassMono.variable} ${dmMono.variable}`}
       suppressHydrationWarning
     >
       <head>

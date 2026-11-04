@@ -11,6 +11,13 @@ import { SKIN_API_VERSION, type SkinComponent, type SkinManifest } from './types
 
 export const SKINS: SkinManifest[] = [
   {
+    id: 'enochian',
+    name: 'Enochian',
+    description: 'A tactile receiver — Ivory and Obsidian finishes, Cinnabar power, and a weighted volume dial.',
+    skinApiVersion: SKIN_API_VERSION,
+    load: () => import('./enochian/EnochianSkin'),
+  },
+  {
     id: 'classic',
     name: 'Classic',
     description:
@@ -108,7 +115,7 @@ export const SKIN_COMPONENTS: Record<string, SkinComponent> = Object.fromEntries
 
 /** Concretely-typed last-resort fallback for indexed lookups (the registry is
  *  a string-keyed record, so TS can't prove a hit). The bundler dedupes this
- *  against the classic entry's chunk. */
+ *  against the Enochian entry's chunk. */
 export const DEFAULT_SKIN_COMPONENT: SkinComponent = dynamic(
-  () => import('./classic/ClassicSkin'),
+  () => import('./enochian/EnochianSkin'),
 ) as SkinComponent;

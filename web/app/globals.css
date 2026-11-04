@@ -96,10 +96,10 @@
 /* Base palette. Dark mode flips bg/ink to charcoal + off-white and inverts the
    paper-grain blend so the texture still reads. */
 :root {
-    --bg: #f3efe6;
-    --ink: #161412;
-    --muted: #6d675e; /* ~5.6:1 on the cream — raised from #7a736a (~4.6:1) */
-    --accent: oklch(0.62 0.22 25); /* ~ #d94b2a hot vermilion */
+    --bg: #ffffff;
+    --ink: #1c1d1b;
+    --muted: #65665f; /* Legible instrument captions on white. */
+    --accent: #c43727; /* Enochian Cinnabar signal. */
     --soft-border: rgba(0, 0, 0, 0.08);
     --separator-soft: rgba(0, 0, 0, 0.08);
     --separator-strong: rgba(0, 0, 0, 0.1);
@@ -145,7 +145,7 @@
      mixed from its own --bg / --ink / --accent; all are mode-agnostic, mixing
      toward --bg / --ink, so no dark-block redeclaration is needed. A theme can
      override any of them via its token map. */
-    --surface: color-mix(in oklab, var(--bg) 93%, var(--ink));
+    --surface: #e8e5dc;
     --surface-border: var(--soft-border);
     --ink-faint: color-mix(in oklab, var(--ink) 45%, var(--bg));
     --line: color-mix(in oklab, var(--ink) 70%, var(--bg));
@@ -193,16 +193,18 @@
     --on-accent: var(--bg);
     /* Default display + mono faces. A theme overrides --display-font/--mono-font
      with a curated id, resolved to a family stack in lib/theme. */
-    --display-font: var(--font-fraunces);
-    --mono-font: var(--font-jetbrains);
+    --display-font: var(--font-space-grotesk);
+    --mono-font: var(--font-ibm-plex-mono);
 }
 
 /* Dark palette — by system preference when no [data-theme] is set. */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --bg: #100e0c;
-        --ink: #ece6dc;
-        --muted: #c1c0bd;
+        --bg: #171817;
+        --ink: #efeee6;
+        --muted: #a8a99f;
+        --surface: #292a27;
+        --accent: #ef6350;
         --soft-border: rgba(255, 255, 255, 0.1);
         --separator-soft: rgba(255, 255, 255, 0.08);
         --separator-strong: rgba(255, 255, 255, 0.12);
@@ -225,9 +227,11 @@
 
 /* Manual override — wins over system preference. */
 :root[data-theme="dark"] {
-    --bg: #100e0c;
-    --ink: #ece6dc;
-    --muted: #c1c0bd;
+    --bg: #171817;
+    --ink: #efeee6;
+    --muted: #a8a99f;
+    --surface: #292a27;
+    --accent: #ef6350;
     --soft-border: rgba(255, 255, 255, 0.1);
     --separator-soft: rgba(255, 255, 255, 0.08);
     --separator-strong: rgba(255, 255, 255, 0.12);

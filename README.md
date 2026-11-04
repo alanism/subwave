@@ -9,6 +9,13 @@ language; the DJ works out what you meant and slots it in.
 It's *radio*, not a playlist. No per-listener shuffle, no skip button, no
 "up next for you." You tune in and hear whatever is on.
 
+## Enochian edition
+
+This fork adds the [Enochian Elements](https://uiux-nonhumanintelligence.web.app/UIUX)
+visual language: a tactile radio receiver, Ivory and Obsidian palettes, Cinnabar
+controls, and IBM Plex typography. Fresh installs use Enochian; saved appearance
+choices keep their precedence. See [design and activation notes](docs/enochian-design.md).
+
 ## Showreel
 
 <table>
@@ -83,7 +90,7 @@ here stays complete and free either way.
 - **Ending-aware transitions.** The bundled analyzer measures BPM, key, loudness, and how every track actually ends, so crossfades size themselves to the material: a real fade rides out long, a cold ending cuts tight. Vocal detection keeps the DJ from talking over a sung intro, and opt-in stem blends mix the outgoing tail into the incoming head for a produced-sounding seam. DJ speech ducks the music and lifts it back up.
 - **Playlist builder.** Describe a playlist in plain language at `/admin/playlists` and the builder turns it into a recipe, resolves it against your library, and keeps recipe-backed playlists topped up as new music lands.
 - **Station imaging.** Jingles, SFX stingers, and instrumental talk-over beds on one admin page — render them through the DJ's voice, generate them from a text prompt, or upload your own audio. See [jingle import formats and existing-file recovery](docs/jingle-audio.md).
-- **Player skins + themes.** Eight player faces — Classic, Unit SW-9, Platter, Drift, Subamp, TTY, AXO-1 and Cipher-3 — with a station default and a per-listener override, plus a theme editor with live preview for colours and type.
+- **Player skins + themes.** Nine player faces — Enochian, Classic, Unit SW-9, Platter, Drift, Subamp, TTY, AXO-1 and Cipher-3 — with a station default and a per-listener override, plus a theme editor with live preview for colours and type.
 - **Private station mode.** Two independent locks over one station password: hide the web player behind a prompt, and/or require listener auth on every stream mount.
 - **Multi-station profiles.** Keep several stations in one install — each with its own library pool, DJ roster, schedule, and settings — and switch which one is live from the admin.
 - **Hourly archives (opt-in).** Save every hour as MP3 for later replay.

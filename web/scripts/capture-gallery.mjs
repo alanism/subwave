@@ -54,7 +54,7 @@ const ONLY = args.only || null;
 {
   const themeIds = PRESS_RUN_PLATES.map(p => p.themeId);
   const skinIds = new Set(PRESS_RUN_PLATES.map(p => p.skinId));
-  if (PRESS_RUN_PLATES.length !== 8) throw new Error('expected exactly 8 plates');
+  if (!PRESS_RUN_PLATES.length) throw new Error('expected at least one plate');
   if (new Set(themeIds).size !== PRESS_RUN_PLATES.length) throw new Error('every theme must appear exactly once');
   if (skinIds.size !== PRESS_RUN_PLATES.length) throw new Error('every skin must appear exactly once');
 }

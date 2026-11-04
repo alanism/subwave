@@ -73,9 +73,9 @@ export const BUILTIN_THEMES: Theme[] = loadBuiltins();
 const BUILTIN_IDS = new Set(BUILTIN_THEMES.map(t => t.id));
 
 export const DEFAULT_THEME_ID =
-  BUILTIN_THEMES.find(t => t.id === 'classic-light')?.id
+  BUILTIN_THEMES.find(t => t.id === 'enochian-ivory')?.id
   ?? BUILTIN_THEMES[0]?.id
-  ?? 'classic-light';
+  ?? 'enochian-ivory';
 
 // Seeded into state/themes/README.md on first read so operators editing the
 // folder directly have the format reference at hand.

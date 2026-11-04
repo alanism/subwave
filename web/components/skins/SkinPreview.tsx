@@ -465,7 +465,28 @@ function CipherPreview() {
   );
 }
 
+function EnochianPreview() {
+  return (
+    <div className="flex size-full items-center justify-center p-2">
+      <div className="flex w-full flex-col gap-2 rounded-xl border border-ink/25 bg-surface p-2 shadow-md">
+        <div className="h-1 w-1/3 bg-ink" />
+        <div className="flex h-8 gap-2">
+          <div className="w-1/2 rounded-full bg-ink" />
+          <div className="flex flex-1 flex-col justify-center gap-1 rounded-sm bg-ink p-1.5"><span className="h-1 w-full bg-bg" /><span className="h-px w-full bg-vermilion" /></div>
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <span className="size-4 rounded-full bg-vermilion" />
+          <span className="h-2 w-5 rounded-sm border border-ink/40" />
+          <span className="h-2 w-5 rounded-sm border border-ink/40" />
+          <span className="size-5 rounded-full bg-ink" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const PREVIEWS: Record<string, () => ReactNode> = {
+  enochian: EnochianPreview,
   classic: ClassicPreview,
   unit: UnitPreview,
   drift: DriftPreview,

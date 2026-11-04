@@ -1,13 +1,13 @@
 // Plate list for the landing page's "Press Run" interlude: one source of truth
 // for the gallery strip, captions, lightbox and scripts/capture-gallery.mjs.
-// Eight skins, eight themes: each appears exactly once.
+// One plate per skin; each plate uses a different theme.
 // Plain data, no React, because the capture script imports it from node.
 
 export type PressRunSkinId =
-  | 'classic' | 'unit' | 'drift' | 'subamp' | 'tty' | 'platter' | 'axo' | 'cipher';
+  | 'enochian' | 'classic' | 'unit' | 'drift' | 'subamp' | 'tty' | 'platter' | 'axo' | 'cipher';
 
 export type PressRunThemeId =
-  | 'classic-light' | 'classic-dark' | 'blueprint' | 'cyberpunk'
+  | 'enochian-ivory' | 'classic-light' | 'classic-dark' | 'blueprint' | 'cyberpunk'
   | 'phosphor' | 'recon' | 'riso' | 'vinyl';
 
 export interface PressRunPlate {
@@ -73,10 +73,13 @@ export const PRESS_RUN_PLATES: readonly PressRunPlate[] = [
   plate(8, 'axo', 'AXO-1',
     'A hi-fi stack drawn at 30° — the switch, knob and keys in the drawing are the controls.',
     'riso', 'Riso'),
+  plate(9, 'enochian', 'Enochian',
+    'A tactile receiver — Ivory and Obsidian finishes, Cinnabar power, and a weighted volume dial.',
+    'enochian-ivory', 'Enochian Ivory'),
 ];
 
-/** Row split for the two marquee bands: plates 1–4 drift left, 5–8 drift right. */
+/** Split all plates between the two marquee bands. */
 export const PRESS_RUN_ROWS: readonly [PressRunPlate[], PressRunPlate[]] = [
   PRESS_RUN_PLATES.slice(0, 4),
-  PRESS_RUN_PLATES.slice(4, 8),
+  PRESS_RUN_PLATES.slice(4),
 ];

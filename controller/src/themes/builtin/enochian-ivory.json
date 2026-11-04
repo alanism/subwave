@@ -1,0 +1,24 @@
+{
+  "id": "enochian-ivory",
+  "name": "Enochian Ivory",
+  "description": "Matte ivory surfaces, precise instrument labels and Cinnabar signal controls.",
+  "mode": "light",
+  "tokens": {
+    "--bg": "#ffffff",
+    "--surface": "#e8e5dc",
+    "--surface-border": "rgba(28,29,27,0.20)",
+    "--field": "#e8e5dc",
+    "--ink": "#1c1d1b",
+    "--muted": "#65665f",
+    "--ink-faint": "#76776f",
+    "--accent": "#c43727",
+    "--accent-2": "#c43727",
+    "--accent-soft": "color-mix(in srgb, #c43727 12%, #ffffff)",
+    "--line": "rgba(28,29,27,0.20)",
+    "--soft-border": "rgba(28,29,27,0.20)",
+    "--overlay": "rgba(0,0,0,0.12)",
+    "--display-font": "space-grotesk",
+    "--mono-font": "ibm-plex-mono",
+    "--grain": "0"
+  }
+}
