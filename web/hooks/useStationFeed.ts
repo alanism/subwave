@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 
 import { pollAsyncWhileVisible } from '@/lib/poll';
 import { MAX_LEAD_SECONDS, splitAudibleTurns } from '@/lib/sessionFeed';
 import { useStationClient } from '@/lib/stationClient';
+import { DESKTOP_EDITION } from '@/lib/desktop';
 import type {
   ActiveShow,
   DjState,
@@ -238,7 +239,7 @@ export function useStationFeed({ leadTrimMs = 0 }: StationFeedOptions = {}): Sta
         }
       } catch {}
     };
-    const stopPolling = pollAsyncWhileVisible(tick, 5000);
+    const stopPolling = pollAsyncWhileVisible(tick, DESKTOP_EDITION ? 500 : 5000);
     return () => {
       stopPolling();
       // A held track switch (or a held spoken line) must not land after teardown.

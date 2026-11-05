@@ -8,6 +8,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     espeak-ng libsndfile1 ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
+# YouTube MP3 imports. EJS is bundled by the official default dependency set.
+ARG YT_DLP_VERSION=2026.08.19
+RUN python3 -m venv /opt/yt-dlp \
+    && /opt/yt-dlp/bin/pip install --no-cache-dir "yt-dlp[default]==${YT_DLP_VERSION}"
+ENV YT_DLP_PATH=/opt/yt-dlp/bin/yt-dlp
+
 # Retry policy for the model/binary pulls below — GitHub releases and HF's xet
 # bridge intermittently 429/5xx in CI, and one blip fails the release build.
 # ARG (not ENV) so it stays build-time only.

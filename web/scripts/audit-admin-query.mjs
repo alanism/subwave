@@ -120,6 +120,9 @@ const ownershipRegistry = ownershipArg === -1
 // endpoint expression). A matching marker must be immediately above the call;
 // unused entries fail so this list cannot become a filename-only exemption.
 const allowed = new Map([
+  ['youtube/YoutubePanel.tsx', new Map([
+    ['youtube-mp3-download', { callee: 'adminResponse', method: 'GET', path: /^\/youtube\/downloads\/\$\{\}\/file$/ }],
+  ])],
   ['AdminShell.tsx', new Map([
     ['first-run-redirect', { callee: 'nativeFetch', method: 'GET', path: /\/onboarding\/status$/ }],
   ])],
@@ -404,7 +407,10 @@ function validateRegisteredRead(file, sourceFile, call, canonical, method, endpo
   return false;
 }
 
-for (const file of filesAt(root)) {
+// Local desktop panels share this same query owner even though they sit
+// beside the server console. Audit them in the production invocation too.
+const auditedFiles = [...filesAt(root), ...(rootArg === -1 ? filesAt(path.resolve(root, '../desktop')) : [])];
+for (const file of auditedFiles) {
   const text = fs.readFileSync(file, 'utf8');
   const sourceFile = ts.createSourceFile(
     file,
@@ -726,7 +732,7 @@ function isHelperDefinitionReference(node, names) {
 }
 
 function rejectOutsideHelperReferences(spec, allowedReferences) {
-  for (const file of filesAt(root)) {
+  for (const file of auditedFiles) {
     const relative = path.relative(root, file);
     const parsed = sourceFor(relative);
     if (!parsed) continue;

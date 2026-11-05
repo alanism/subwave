@@ -13,6 +13,9 @@ __pycache__/
 
 # Next.js
 .next/
+.next-desktop/
+desktop/runtime/
+desktop/dist/
 out/
 
 # TypeScript

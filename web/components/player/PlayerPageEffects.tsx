@@ -9,6 +9,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { defaultStationClient } from '@/lib/stationClient';
+import { DESKTOP_EDITION } from '@/lib/desktop';
 
 export default function PlayerPageEffects() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function PlayerPageEffects() {
   // Navidrome creds), bounce the operator into the wizard instead of dropping
   // them on a silent player. Mirrors AdminShell.
   useEffect(() => {
+    if (DESKTOP_EDITION) return;
     defaultStationClient.onboardingStatus().then(j => {
       if (j?.needsSetup) router.push('/onboarding');
     });

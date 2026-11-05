@@ -1,128 +1,42 @@
-/* One physical enclosure. All colours derive from the active station theme. */
-.page {
-  --case: var(--surface);
-  --case-edge: color-mix(in srgb, var(--surface) 76%, var(--ink));
-  --hardware-shadow: rgb(0 0 0 / 24%);
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  padding: 0 2.5%;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-sans), sans-serif;
-  container-type: inline-size;
+/* Arrangement ONLY. No knob, cap, slider, switch or display styling here.
+   Those come from the user's unmodified vendor/controls.css. */
+.page { position: absolute; inset: 0; overflow: auto; display: flex; flex-direction: column; background: var(--bg); color: var(--ink); font-family: "IBM Plex Sans", sans-serif; line-height: normal; padding: 0 clamp(16px, 4vw, 54px); }
+.header { display: flex; justify-content: space-between; align-items: center; min-height: 76px; gap: 24px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.7px; }
+.headerTools { display: flex; align-items: center; gap: 20px; font-size: 13px; }
+.main { width: min(100%, 1040px); margin: auto; padding: 48px 0; }
+.sectionHead { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 18px; color: var(--muted); font: 500 11px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 1.2px; }
+.sectionHead h2 { margin: 0; color: var(--ink); font: inherit; }
+.nowPlaying { margin-bottom: 32px; }
+.instruments { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 32px; }
+.instrument { min-width: 0; grid-column: span 3; }
+.volumeStage, .transportStage { min-height: 380px; background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; }
+.volumeStage { gap: 12px; }
+.transportStage { justify-content: space-between; gap: 24px; }
+.transportRow { display: flex; align-items: center; justify-content: center; width: 100%; }
+.controlColumn { display: flex; align-items: center; flex-direction: column; gap: 8px; }
+.controlColumn > span { font: 600 9px "IBM Plex Mono", monospace; letter-spacing: 1.2px; color: var(--muted); }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 22px 0; border-top: 1px solid var(--line); flex-shrink: 0; font: 500 10px "IBM Plex Mono", monospace; letter-spacing: 1px; }
+.footer nav { display: flex; gap: 30px; }
+.footer a, .footer button { background: transparent; padding: 0; border: 0; color: var(--ink); font: inherit; text-decoration: none; cursor: pointer; }
+.footer a:focus-visible, .footer button:focus-visible { outline: 2px solid #cc0000; outline-offset: 5px; }
+/* The atlas itself uses display:contents on .source when arranging instruments.
+   Preserve each scope's inherited tokens without adding a second surface. */
+.page :global(.source) { display: contents; }
+/* The receiver power key relies on the browser padding cleared by Tailwind. */
+.page :global(.pwr) { padding: 1px 6px; }
+/* Verbatim dark source tokens from atlas.css, scoped to this player. */
+:global(html[data-theme="dark"]) .page :global(.source) { --ink:#f7f7f8; --muted:#aaaab0; --tile:#171719; --paper:#09090a; --line:#3a3a3e; }
+.page[data-local="true"] .header { min-height:48px; }
+.page[data-local="true"] .main { padding-block:16px; }
+.page[data-local="true"] .nowPlaying { margin-bottom:16px; }
+.page[data-local="true"] .transportRow { flex-wrap:wrap; row-gap:16px; }
+@media (max-width: 720px) {
+  .main { padding-top: 30px; padding-bottom: 30px; }
+  .instruments { grid-template-columns: 1fr; gap: 28px; }
+  .instrument { grid-column: auto; }
+  .volumeStage, .transportStage { min-height: 360px; padding-inline: 8px; }
+  .transportRow { flex-wrap: wrap; }
+  .footer { font-size: 9px; }
+  .footer nav { gap: 18px; }
 }
-.page button, .page a { -webkit-tap-highlight-color: transparent; }
-.page button { cursor: pointer; }
-.page button:focus-visible, .page a:focus-visible, .dial:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 5px;
-}
-.header { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 76px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
-.brand { display: flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 700; letter-spacing: -1.2px; text-decoration: none; min-width: 0; overflow-wrap: anywhere; }
-.brandDot { width: 20px; height: 20px; flex: none; border-radius: 50%; background: var(--accent); box-shadow: inset 0 1px 2px rgb(0 0 0 / 20%); }
-.headerRight { display: flex; gap: 24px; align-items: center; color: var(--muted); font-size: 18px; }
-.appearance { position: relative; border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; font-size: 14px; color: var(--ink); }
-.appearance > button { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
-.appearance:focus-within { outline: 3px solid var(--accent); outline-offset: 3px; }
-.appearance > span { pointer-events: none; }
-.main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: clamp(40px, 5vh, 80px); padding-top: clamp(50px, 9vh, 105px); padding-bottom: 40px; }
-.receiver { width: min(100%, 1240px); margin-inline: auto; flex-shrink: 0; padding: 12px; border: 1px solid var(--case-edge); border-radius: 56px; background: linear-gradient(150deg, var(--surface), var(--case) 12%, var(--case) 86%, var(--case-edge)); box-shadow: inset 2px 4px 5px color-mix(in srgb, var(--bg) 80%, transparent), inset -2px -5px 7px rgb(0 0 0 / 12%), 0 26px 25px -12px var(--hardware-shadow); }
-.nameplate { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 42px 24px; border-bottom: 1px solid var(--case-edge); box-shadow: 0 1px 0 color-mix(in srgb, var(--bg) 80%, transparent); }
-.identity { display: flex; align-items: center; gap: 24px; min-width: 0; }
-.identity strong { font-size: 36px; line-height: 1; letter-spacing: -1.5px; overflow-wrap: anywhere; }
-.identity > span, .status, .legend, .displayFooter, .deviceFooter, .powerGroup > span, .volumeLabel, .key, .footer { font-family: var(--font-ibm-plex-mono), monospace; }
-.identity > span { font-size: 13px; letter-spacing: 1.5px; }
-.status { display: flex; align-items: center; gap: 18px; font-size: 14px; letter-spacing: 2px; white-space: nowrap; }
-.lamp { width: 17px; height: 17px; border: 3px solid var(--ink); border-radius: 50%; background: var(--case-edge); box-shadow: 0 1px 2px var(--surface), inset 0 2px 3px rgb(0 0 0 / 50%); }
-.lamp[data-on='true'] { background: var(--accent); box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 70%, transparent), inset 0 1px 3px var(--surface); }
-.face { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 22px; border-bottom: 1px solid var(--case-edge); box-shadow: 0 1px 0 color-mix(in srgb, var(--bg) 80%, transparent); }
-.grille { min-height: 244px; border-radius: 140px; border: 3px solid var(--case-edge); background: #141512 url('/skins/enochian/grille.webp') repeat center / 360px auto; box-shadow: inset 0 5px 12px #000, 0 2px 0 var(--surface); }
-.display { display: flex; flex-direction: column; justify-content: center; min-width: 0; border-radius: 20px; border: 4px solid var(--case-edge); background: #1c1d1b; box-shadow: inset 0 4px 10px #000, 0 2px 0 var(--surface); color: #f5f4ee; padding: 25px 30px; }
-.legend { font-size: 14px; letter-spacing: 2px; }
-.display h1 { font-size: clamp(24px, 2.7cqw, 36px); font-weight: 600; line-height: 1.16; letter-spacing: -.8px; margin: 16px 0 10px; overflow-wrap: anywhere; }
-.display p { font-size: 20px; color: #acada7; margin: 0; line-height: 1.4; overflow-wrap: anywhere; }
-.signalRule { height: 2px; background: var(--accent); margin: 22px 0; }
-.displayFooter { font-size: 12px; letter-spacing: 1.4px; line-height: 1.5; }
-.controls { display: grid; grid-template-columns: 210px 1fr 220px; align-items: center; padding: 22px 28px 16px; gap: 26px; }
-.powerGroup { display: flex; flex-direction: column; align-items: center; gap: 16px; border-right: 1px solid var(--case-edge); padding: 4px 20px 4px 0; }
-.powerGroup > span, .volumeLabel { font-size: 14px; font-weight: 500; letter-spacing: .7px; }
-.power { border: 6px solid color-mix(in srgb, var(--accent) 30%, #3c3029); width: 108px; height: 108px; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--accent) 90%, #000) 0 42%, var(--accent) 72%); color: #fff; box-shadow: inset 0 2px 2px rgb(255 255 255 / 50%), inset 0 -4px 5px rgb(0 0 0 / 24%), 0 4px 5px rgb(0 0 0 / 35%), 0 0 0 2px var(--case-edge); transition: transform 120ms, box-shadow 120ms; }
-.power svg { width: 36px; height: 36px; stroke-width: 2; }
-.power:active, .power[aria-pressed='true'] { transform: translateY(3px); box-shadow: inset 0 4px 8px rgb(0 0 0 / 40%), 0 1px 1px rgb(255 255 255 / 50%); }
-.keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.key { height: 66px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--ink) 70%, var(--case)); background: linear-gradient(175deg, var(--surface), var(--case) 18%, var(--surface) 75%, var(--case-edge)); color: var(--ink); font-size: 16px; font-weight: 600; text-transform: uppercase; box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--surface) 60%, transparent), inset 0 5px 7px rgb(0 0 0 / 6%), 0 5px 4px rgb(0 0 0 / 23%); transition: transform 100ms, box-shadow 100ms; }
-.key:hover { filter: brightness(1.04); }
-.key:active { transform: translateY(4px); box-shadow: inset 0 3px 7px rgb(0 0 0 / 15%), 0 1px 1px var(--hardware-shadow); }
-.volume { border-left: 1px solid var(--case-edge); display: flex; flex-direction: column; align-items: center; gap: 4px; padding-left: 20px; }
-.dial { width: 144px; height: 144px; position: relative; display: grid; place-items: center; touch-action: none; cursor: ns-resize; border-radius: 50%; user-select: none; }
-.ticks { position: absolute; inset: 0; width: 100%; height: 100%; fill: var(--ink); }
-.knob { width: 112px; height: 112px; border: 4px solid #11120f; border-radius: 50%; position: relative; background: radial-gradient(ellipse at 40% 30%, #393a35, #22231f 75%); box-shadow: inset 0 2px 2px #63645d, inset 0 -4px 3px #111, 0 5px 5px rgb(0 0 0 / 38%); }
-.marker { position: absolute; left: calc(50% - 3px); top: 6px; height: 28px; width: 6px; border-radius: 2px; background: var(--accent); box-shadow: inset 1px 1px 1px rgb(255 255 255 / 45%); }
-.volumeLabel { padding: 7px 10px; min-height: 36px; color: var(--ink); border: 0; border-radius: 4px; background: transparent; }
-.volumeLabel[aria-pressed='true'] { color: var(--accent); }
-.deviceFooter { display: flex; justify-content: space-between; padding: 16px 42px 14px; border-top: 1px solid var(--case-edge); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--bg) 70%, transparent); font-size: 12px; letter-spacing: 1.4px; }
-.statement { display: flex; gap: 24px; justify-content: space-between; align-items: center; }
-.statement p { margin: 0; font-size: 32px; letter-spacing: -.8px; font-weight: 500; }
-.statement > span { color: var(--muted); font-size: 18px; }
-.footer { display: flex; justify-content: space-between; padding: 18px 0 24px; border-top: 1px solid var(--line); font-size: 15px; font-weight: 500; flex-shrink: 0; }
-.footer nav { display: flex; gap: 64px; }
-.footer a, .footer button { color: inherit; text-decoration: none; background: none; padding: 0; border: 0; font: inherit; }
-.footer a:hover, .footer button:hover { color: var(--accent); }
-
-@container (max-width: 1000px) {
-  .nameplate { padding: 18px 24px; }
-  .identity { gap: 16px; }
-  .identity strong { font-size: 28px; }
-  .identity > span { font-size: 10px; }
-  .controls { grid-template-columns: 130px 1fr 160px; gap: 16px; padding-inline: 12px; }
-  .keys { gap: 12px; }
-  .key { font-size: 12px; }
-  .power { width: 88px; height: 88px; }
-  .dial { width: 124px; height: 124px; }
-  .knob { width: 94px; height: 94px; }
-  .statement p { font-size: 24px; }
-  .statement > span { font-size: 15px; }
-}
-@container (max-width: 680px) {
-  .header { min-height: 68px; }
-  .brand { font-size: 24px; gap: 9px; }
-  .brandDot { width: 14px; height: 14px; }
-  .headerRight > span { display: none; }
-  .main { padding-top: 32px; gap: 35px; padding-bottom: 30px; }
-  .receiver { border-radius: 32px; padding: 8px; }
-  .nameplate { padding: 18px 14px; gap: 12px; }
-  .identity { align-items: flex-start; flex-direction: column; gap: 6px; }
-  .identity strong { font-size: 24px; }
-  .identity > span { font-size: 8px; letter-spacing: 1.1px; }
-  .status { gap: 8px; font-size: 10px; letter-spacing: 1px; }
-  .lamp { width: 13px; height: 13px; border-width: 2px; }
-  .face { display: flex; flex-direction: column-reverse; gap: 16px; padding: 16px 10px; }
-  .display { min-height: 210px; padding: 22px; border-radius: 15px; }
-  .display h1 { font-size: 28px; margin-top: 14px; }
-  .display p { font-size: 17px; }
-  .legend { font-size: 11px; }
-  .displayFooter { font-size: 9px; letter-spacing: .8px; }
-  .grille { min-height: 95px; }
-  .controls { grid-template-columns: 1fr 1fr; gap: 14px; padding: 12px 8px 20px; }
-  .powerGroup { border: 0; padding: 0; gap: 12px; }
-  .power { width: 88px; height: 88px; }
-  .power svg { width: 30px; height: 30px; }
-  .volume { grid-column: 2; grid-row: 1; padding: 0; border: 0; }
-  .dial { width: 115px; height: 115px; }
-  .knob { width: 88px; height: 88px; }
-  .volumeLabel, .powerGroup > span { font-size: 11px; }
-  .keys { grid-column: 1 / -1; gap: 10px; }
-  .key { height: 54px; font-size: 11px; }
-  .deviceFooter { padding: 14px 12px 10px; gap: 10px; font-size: 8px; letter-spacing: .5px; }
-  .statement { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .statement p { font-size: 26px; max-width: 330px; line-height: 1.25; }
-  .statement > span { font-size: 14px; }
-  .footer { font-size: 12px; }
-  .footer nav { gap: 28px; }
-}
-@media (prefers-reduced-motion: reduce) { .page * { transition: none; } }
-.page[data-contained='true'] .main { padding-top: 24px; }
-.page[data-contained='true'] .statement { display: none; }

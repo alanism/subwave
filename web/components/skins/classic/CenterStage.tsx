@@ -16,6 +16,7 @@ import { useStationClient } from '@/lib/stationClient';
 import type { TrackLyrics } from '@/components/skins/lyrics';
 import LyricsSettings, { usePopoverDismiss } from '@/components/skins/LyricsSettings';
 import type { NowPlayingTrack, QueueEntry, SessionTurn } from '@/lib/types';
+import { useDesktopSurface } from '@/components/desktop/DesktopContext';
 
 /** Seconds before the end of the track that the "up next" tease fades in. The
  *  queue head is known long before this; the window is pacing, not data. */
@@ -136,6 +137,7 @@ export interface CenterStageProps {
 }
 
 export default memo(function CenterStage({ nowPlaying, trackStartedAt, llmTokens, feed, djLineOn, boothBuddyOn, offline, upNext, lyricsShown = false, lyrics = null, onOpenBooth, onOpenTimeline }: CenterStageProps) {
+  const desktop = useDesktopSurface();
   const client = useStationClient();
   // The 1s elapsed tick lives here, in the component that displays it, so it
   // only re-renders this subtree — not the whole player (see useElapsed).
@@ -237,6 +239,7 @@ export default memo(function CenterStage({ nowPlaying, trackStartedAt, llmTokens
     // one-line title and the artist, and drops what lg drops. AmbientLyrics
     // starts the lyrics at a fixed 152px below it, so the row stays ~65px.
     <div
+      data-local-stage={desktop ? true : undefined}
       className={cn(
         'absolute top-[72px] right-[80px] bottom-[calc(220px+var(--lyrics-band,0px))] left-4 flex flex-col items-start justify-center sm:right-24 sm:left-8 [@media(min-width:640px)_and_(max-height:759px)]:bottom-[calc(212px+var(--lyrics-band,0px))] [@media(min-width:640px)_and_(max-height:759px)]:justify-end [@media(min-width:640px)_and_(min-height:760px)]:bottom-[calc(300px+var(--lyrics-band,0px))]',
         lyricsShown && '[--lyrics-band:132px] lg:[--lyrics-band:0px] [@media(max-width:1023px)_and_(max-height:699px)]:[--lyrics-band:0px]',
@@ -260,7 +263,7 @@ export default memo(function CenterStage({ nowPlaying, trackStartedAt, llmTokens
           ref={coverRef}
           type="button"
           onClick={onOpenTimeline}
-          aria-label="Open the timeline"
+          aria-label={desktop ? 'Open library' : 'Open the timeline'}
           className={cn(
             // Sized to width but capped by viewport height (20vh) so a
             // short/wide window doesn't spend a third of its height on the
@@ -307,13 +310,13 @@ export default memo(function CenterStage({ nowPlaying, trackStartedAt, llmTokens
         <div className={cn('relative min-w-0', lyricsShown && '[@media(max-width:639px)_and_(min-height:700px)]:static')}>
           <div className={cn('v3-caption mb-[14px] text-muted', lyricsShown && '[@media(max-width:639px)_and_(min-height:700px)]:mb-1 [@media(max-width:639px)_and_(min-height:700px)]:truncate')}>
             {offline ? (
-              'Off air'
+              desktop ? 'No songs in this source' : 'Off air'
             ) : (
               <>
                 {/* The phone view's row is plainly the track on air, and the
                     label would push the clock off a narrow phone. */}
                 <span className={cn(lyricsShown && '[@media(max-width:639px)_and_(min-height:700px)]:hidden')}>
-                  Now playing{live ? ' — ' : ''}
+                  {desktop && !live ? 'Your local music' : 'Now playing'}{live ? ' — ' : ''}
                 </span>
                 {live && duration > 0 ? (
                   <button
@@ -402,7 +405,7 @@ export default memo(function CenterStage({ nowPlaying, trackStartedAt, llmTokens
                 </>
               ) : (
                 <h1 className="v3-title m-0 text-muted">
-                  {offline ? 'off air' : 'scanning the dial'}
+                  {desktop ? (desktop.library.data?.tracks.length ? 'ready to play' : 'add your first song') : offline ? 'off air' : 'scanning the dial'}
                   <span className="v3-blink ml-[0.1em]">_</span>
                 </h1>
               )}
@@ -439,7 +442,7 @@ export default memo(function CenterStage({ nowPlaying, trackStartedAt, llmTokens
             key="up-next"
             type="button"
             onClick={onOpenTimeline}
-            title="Open the timeline"
+            title={desktop ? 'Open library' : 'Open the timeline'}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}

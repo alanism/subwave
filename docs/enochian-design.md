@@ -1,56 +1,80 @@
-# Enochian edition
+# Enochian edition — original atlas components
 
-Reference: https://uiux-nonhumanintelligence.web.app/UIUX
+Source of truth: [Enochian Elements Interactive Atlas](https://uiux-nonhumanintelligence.web.app/UIUX).
+The listener embeds the author's actual HTML/CSS and ports its interaction code
+to React. Receiver controls come from the Radio Player and Input Selector;
+the arcade-style Button Banks and large Push Switch are not used. The atlas controls must remain faithful to their source;
+layout and sizing may adapt to the station, but their materials and geometry are
+not to be redesigned.
 
-The listener is a physical receiver: one enclosure, speaker grille, inset display,
-power switch, three action keys and a volume dial. The existing player core owns
-audio, authentication and live metadata. All controls are HTML, not a rendered image.
+## Component mapping
 
-## Visual specification
+| Atlas component | Station use | Preserved source |
+| --- | --- | --- |
+| Rotary Knob 01 (`#darkDial`) | Volume | 220px dial, original dot/end ticks, base, cap and dash; ±135° rotation, 150px drag travel, 2% arrow increments |
+| Slider 01 (`#trk`) | Same volume | 280px track, 66×34px thumb and five ribs; original spring, grab offset, 1% arrows and 10% Page keys |
+| Keyboard display (`#keyboardDisplay`) | Live title and artist | Original inset surface, padding, font and shadow; width follows the page |
+| Radio Player power head (`#radio .rhead`) | Tune in/out and connection status | Original 30px white power ring, 5px state dot, display, 70×72px hit area and receiver finishes |
+| Toggle Switch 01 (`#std`) | Mute | Original cap, 44px throw and 3px drag threshold |
+| Input Selector (`#ilk`) | Local panels, Next, genre selection and importer actions; hosted station drawers | Original 36px Ivory caps, 46px sockets, side labels, staggered rows, PRESS/SNAP spring travel and Ivory/Obsidian deck |
+| Search Field (`#rs`) | YouTube song/URL search | Original rolling 60px ball, field, icon, shadows and 160/20/1 spring; Escape closes and clears |
+| Toggle Switch 01 (`#std`) | Automatic genre imports | Original switch, bound to the import preference |
 
-- White page (#ffffff), ivory enclosure (#e8e5dc), obsidian display (#1c1d1b),
-  cinnabar signal (#c43727). Obsidian theme uses #171817 page and #292a27 enclosure.
-- IBM Plex Sans body and headings; IBM Plex Mono instrument labels. Headings 30–36px,
-  header 24px, secondary text 18px, uppercase instrument legends 11–13px.
-- Desktop: wide centered receiver, two equal speaker/display columns, control row
-  below. Mobile: display above grille, power and dial flanking the three keys.
-- One 28px enclosure with bevel, 18px display, capsule grille, 9px dished keys.
-  Shadows simulate physical depth only; no image overlays or decorative gradients.
-- Power icon: Lucide, 2px outline. Volume: charcoal knob, red marker, dot ticks.
-  Focus rings, pressed states and disabled states remain visible.
-- Header: SUB/WAVE, Personal radio, Appearance. Receiver: SUB/WAVE, ENOCHIAN
-  RECEIVER, STANDBY / TUNING / ON AIR / OFF AIR. Display: NOW PLAYING, live title
-  and artist, or Waiting for the broadcast / Tune in to hear what is on.
-  Bottom: ONE STATION / ONE SHARED STREAM. Keys: TUNE IN / TUNE OUT, REQUEST,
-  TIMELINE, SCHEDULE, VOLUME. Footer: SUB/WAVE × ENOCHIAN, INTERNET RADIO.
-- Below: One broadcast. A shared frequency. / Your library. Your DJ. Your station.
-  Navigation: LISTEN, BOOTH, ADMIN.
+`SourceControls.tsx`, `ReceiverControls.tsx`, `SourceSearch.tsx` and `VolumeDial.tsx` retain the original class names and DOM
+parts. `Enochian.module.css` only arranges these components and restores the
+atlas's inherited typography/tokens. It does not restyle their surfaces.
 
-## Integration
+## Source preservation
 
-`enochian` is the fresh-install skin; `enochian-ivory` the fresh-install theme.
-Saved operator and listener selections retain precedence. Both themes are in the
-existing registry, so admin primitives and listener drawers share their palette.
-Appearance still exposes every upstream skin. Request, timeline, booth and schedule
-use the upstream components. No listener skip, seeking, fake equalizer or fake signal.
+Snapshots are kept in `web/components/skins/enochian/vendor/`:
 
-## Activation on an existing station
+- `controls.css`: byte-for-byte source from
+  [/UIUX/controls.css?v=a673dc924139](https://uiux-nonhumanintelligence.web.app/UIUX/controls.css?v=a673dc924139).
+  SHA-256: `a673dc924139b8d46e6967a0b594d8fbff6498978097e21c421a3f4e3082e8ca`.
+- `controls.reference.js.txt`: unmodified interaction source from
+  [/UIUX/controls.js?v=c6829d0d7f9c](https://uiux-nonhumanintelligence.web.app/UIUX/controls.js?v=c6829d0d7f9c).
+  SHA-256: `c6829d0d7f9c8a4745bb1961a536f3f1af140df8839919ccdadc58c1ffef519b`.
+- `atlas.reference.html.txt`: original markup for comparison.
+- `fonts.css`: the source's IBM Plex font declarations, with font URLs changed
+  to the local copies in `web/public/skins/enochian/fonts/`.
 
-In Admin → Settings choose **Enochian** as the player skin and **Enochian Ivory**
-or **Enochian Obsidian** as the theme. A listener can also choose them in Appearance.
-Persisted choices intentionally outrank the new fresh-install defaults.
+`interaction.ts` adapts the original `driveDial`, `makeHSlider`, `makeToggle` and
+`Spring` code: typed element refs replace global IDs; callbacks update PlayerCore;
+listeners, animations and observers are cleaned up on unmount. Spring parameters,
+integration step, geometry and keyboard increments are preserved. Reduced-motion
+and lite mode settle directly. Receiver keys use the original PRESS parameters
+(720/32/.55), SNAP release, and `--lift` positions of 1 and .15. The receiver
+power dot follows the actual tune state. Momentary import actions return on
+release; selected drawer keys and pending jobs remain seated.
+`feedback.ts` uses the original filtered-noise
+click envelopes and closes its AudioContext on unmount; station mute disables it.
+The atlas's demonstration audio is not used as a station stream.
 
-The broadcast stack still needs its normal Navidrome, Icecast and DJ configuration.
-This is a presentation change, not a hosted station or a backend replacement.
+The Ivory/Obsidian page palettes use the source atlas's exact tokens. No generated
+images are used to approximate any control. The gallery preview is a screenshot
+of the rendered application.
 
-## Asset provenance
+## Integration and activation
 
-The concept and woven grille were generated with the built-in Image Gen tool.
-The shipped grille is `web/public/skins/enochian/grille.webp`; it is the only
-raster surface. All legends, status, switches, keys and dial geometry are code.
-The asset brief was: straight-on macro of premium obsidian woven speaker fabric,
-fine charcoal fibres, low contrast, evenly lit, edge-to-edge, no enclosure,
-markings, text, vignette or gradient. The concept brief specified the complete
-receiver, white page, Ivory enclosure, Cinnabar power, dark display, three
-physical keys, weighted dial, IBM Plex typography and the exact visible copy
-listed above. No raster text is used as an interactive control.
+The existing player core still owns audio, station authentication and metadata.
+Power uses `useTuneInGate`; both volume controls update the same player value;
+mute updates actual playback. Request, timeline, schedule and booth reuse the
+upstream components in drawers. No broadcast/backend configuration is replaced.
+
+`enochian` and `enochian-ivory` are fresh-install defaults. Saved operator and
+listener choices retain precedence. On an existing station select **Enochian**
+and **Enochian Ivory** or **Enochian Obsidian** in Appearance or Admin → Settings.
+All upstream skins remain available.
+
+The hosted web station still needs its normal Navidrome, Icecast and DJ configuration.
+The Linux desktop edition starts its bundled local service instead, with no login
+or station setup. Its shared Library, Playlists, Genre stations, YouTube and Settings
+panels preserve one audio element across either skin. See [the desktop guide](../desktop/README.md).
+
+## Verification
+
+`npm test -- enochian` checks the unmodified source snapshots, original dial
+geometry and the adapted spring's settling/cleanup. Browser checks compare
+computed gradients, shadows, dimensions, borders, padding and typography against
+the live source, then exercise the linked volume controls, mute, power and
+drawers at desktop and mobile widths.

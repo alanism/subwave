@@ -9,11 +9,11 @@ import dynamic from 'next/dynamic';
 import { DEFAULT_SKIN_ID, canonicalSkinId } from '@/lib/skin';
 import { SKIN_API_VERSION, type SkinComponent, type SkinManifest } from './types';
 
-export const SKINS: SkinManifest[] = [
+const ALL_SKINS: SkinManifest[] = [
   {
     id: 'enochian',
     name: 'Enochian',
-    description: 'A tactile receiver — Ivory and Obsidian finishes, Cinnabar power, and a weighted volume dial.',
+    description: 'The original Enochian controls — native knobs, ribbed slider, receiver power, Input Selector keys and display.',
     skinApiVersion: SKIN_API_VERSION,
     load: () => import('./enochian/EnochianSkin'),
   },
@@ -82,6 +82,13 @@ export const SKINS: SkinManifest[] = [
     load: () => import('./cipher/CipherSkin'),
   },
 ];
+
+// The Linux edition deliberately presents two faces. The station/web build
+// retains its existing gallery, and both editions use the same skin modules.
+export const SKINS: SkinManifest[] = process.env.NEXT_PUBLIC_SUBWAVE_DESKTOP === '1'
+  ? ALL_SKINS.filter(skin => skin.id === 'classic' || skin.id === 'enochian')
+    .map(skin => skin.id === 'classic' ? { ...skin, name: 'Original' } : skin)
+  : ALL_SKINS;
 
 // Id facts (default id, legacy aliases) live in lib/skin.ts so the server
 // layout's SKIN_INIT_SCRIPT derives from the same data without importing this

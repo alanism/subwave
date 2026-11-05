@@ -97,9 +97,9 @@
    paper-grain blend so the texture still reads. */
 :root {
     --bg: #ffffff;
-    --ink: #1c1d1b;
-    --muted: #65665f; /* Legible instrument captions on white. */
-    --accent: #c43727; /* Enochian Cinnabar signal. */
+    --ink: #111111;
+    --muted: #65656a; /* Legible instrument captions on white. */
+    --accent: #cc0000; /* Enochian Cinnabar signal. */
     --soft-border: rgba(0, 0, 0, 0.08);
     --separator-soft: rgba(0, 0, 0, 0.08);
     --separator-strong: rgba(0, 0, 0, 0.1);
@@ -145,7 +145,7 @@
      mixed from its own --bg / --ink / --accent; all are mode-agnostic, mixing
      toward --bg / --ink, so no dark-block redeclaration is needed. A theme can
      override any of them via its token map. */
-    --surface: #e8e5dc;
+    --surface: #f5f5f6;
     --surface-border: var(--soft-border);
     --ink-faint: color-mix(in oklab, var(--ink) 45%, var(--bg));
     --line: color-mix(in oklab, var(--ink) 70%, var(--bg));
@@ -200,11 +200,11 @@
 /* Dark palette — by system preference when no [data-theme] is set. */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --bg: #171817;
-        --ink: #efeee6;
-        --muted: #a8a99f;
-        --surface: #292a27;
-        --accent: #ef6350;
+        --bg: #09090a;
+        --ink: #f7f7f8;
+        --muted: #aaaab0;
+        --surface: #171719;
+        --accent: #cc0000;
         --soft-border: rgba(255, 255, 255, 0.1);
         --separator-soft: rgba(255, 255, 255, 0.08);
         --separator-strong: rgba(255, 255, 255, 0.12);
@@ -227,11 +227,11 @@
 
 /* Manual override — wins over system preference. */
 :root[data-theme="dark"] {
-    --bg: #171817;
-    --ink: #efeee6;
-    --muted: #a8a99f;
-    --surface: #292a27;
-    --accent: #ef6350;
+    --bg: #09090a;
+    --ink: #f7f7f8;
+    --muted: #aaaab0;
+    --surface: #171719;
+    --accent: #cc0000;
     --soft-border: rgba(255, 255, 255, 0.1);
     --separator-soft: rgba(255, 255, 255, 0.08);
     --separator-strong: rgba(255, 255, 255, 0.12);

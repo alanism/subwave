@@ -40,6 +40,8 @@ export interface Player {
   play: () => void;
   pause: () => void;
   stop: () => void;
+  /** Synchronous state for consecutive native commands before React commits. */
+  isTunedIn: () => boolean;
   toggleMute: () => void;
   muted: boolean;
   // True when the idle cutoff, not the listener, tore playback down. Cleared on the next tune().
@@ -443,5 +445,5 @@ export function usePlayer({ initialVolume = 1, opusEnabled = null, bufferSeconds
     }
   };
 
-  return { audioRef, attachAudio, tunedIn, playbackState, status, volume, setVolume, tune, play, pause, stop, toggleMute, muted: volume === 0, idleStopped };
+  return { audioRef, attachAudio, tunedIn, playbackState, status, volume, setVolume, tune, play, pause, stop, isTunedIn: () => tunedInRef.current, toggleMute, muted: volume === 0, idleStopped };
 }

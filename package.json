@@ -17,6 +17,8 @@
     "dev": "node bin/subwave setup",
     "dev:docker": "docker compose -f docker-compose.dev.yml up -d",
     "dev:web": "npm --prefix web run dev",
+    "desktop": "npm --prefix desktop start",
+    "desktop:build": "npm --prefix desktop run build",
     "rebuild": "docker compose -f docker-compose.dev.yml up -d --build",
     "logs": "docker compose -f docker-compose.dev.yml logs -f",
     "down": "docker compose -f docker-compose.dev.yml down",

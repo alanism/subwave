@@ -10,7 +10,7 @@ export default function ServiceWorkerRegister(): null {
     if (!('serviceWorker' in navigator)) return;
 
     // Disable and clear service workers in dev; cached webpack chunks go stale after restarts.
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_SUBWAVE_DESKTOP === '1') {
       navigator.serviceWorker
         .getRegistrations()
         .then((regs) => regs.forEach((r) => r.unregister()))

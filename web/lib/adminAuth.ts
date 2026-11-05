@@ -3,9 +3,12 @@
 import { useCallback, useEffect, useSyncExternalStore } from 'react';
 import { AdminReadTimeoutError, runAdminRead } from './admin-read';
 import { adminLockedUntil } from './admin-lock';
+import { DESKTOP_EDITION } from './desktop';
+import { createDesktopAdminSession } from './desktop-admin';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 const STORAGE_KEY = 'subwave_admin_auth';
+const desktopSession = createDesktopAdminSession(API_URL);
 
 export interface SignInResult {
   ok: boolean;
@@ -83,6 +86,7 @@ function readStoredAuth(): string | null {
 }
 
 function startBrowserStore(): void {
+  if (DESKTOP_EDITION) return;
   if (typeof window === 'undefined' || browserStoreStarted) return;
   browserStoreStarted = true;
   const stored = readStoredAuthState();
@@ -214,7 +218,7 @@ export function useAdminAuth(): AdminAuth {
     return r;
   }, []);
 
-  return { ...snapshot, signIn, signOut, adminFetch };
+  return DESKTOP_EDITION ? desktopSession : { ...snapshot, signIn, signOut, adminFetch };
 }
 
 export { API_URL as ADMIN_API_URL };

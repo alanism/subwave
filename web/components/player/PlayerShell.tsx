@@ -15,6 +15,7 @@ import {
   saveSkinOverride,
 } from '@/lib/skin';
 import { skinLocked } from '@/lib/skinLock';
+import { DESKTOP_EDITION } from '@/lib/desktop';
 import {
   DEFAULT_SKIN_COMPONENT,
   DEFAULT_SKIN_ID,
@@ -26,6 +27,9 @@ import { SkinSelectionProvider, type SkinSelection } from '@/components/skins/Sk
 import type { SkinComponent } from '@/components/skins/types';
 import { PlayerCoreProvider, usePlayerAudio, usePlayerFeed } from './PlayerCore';
 import { StationPasswordGate, useStationAuth } from './StationGate';
+import dynamic from 'next/dynamic';
+
+const DesktopSurface = dynamic(() => import('@/components/desktop/DesktopSurface'));
 
 export interface PlayerShellProps {
   /** Explicit skin — bypasses registry resolution (previews, tests). */
@@ -102,6 +106,26 @@ function ShellChrome({ skin, contained }: { skin?: SkinComponent; contained: boo
     saveSkinOverride(id);
     startTransition(() => setOverrideId(id));
   }, []);
+
+  // Menu changes enter the same skin path as Appearance and keyboard cycling;
+  // the shell's single audio element survives all three.
+  const [desktopReady, setDesktopReady] = useState(!DESKTOP_EDITION);
+  useEffect(() => {
+    if (!DESKTOP_EDITION || contained) return;
+    const bridge = window.desktopPlayer;
+    if (!bridge) { setDesktopReady(true); return; }
+    let live = true;
+    const unsubscribe = bridge.onSkin(setOverride);
+    void bridge.skin().then(id => {
+      if (!live) return;
+      saveSkinOverride(id);
+      startTransition(() => { setOverrideId(id); setDesktopReady(true); });
+    }, () => { if (live) setDesktopReady(true); });
+    return () => { live = false; unsubscribe(); };
+  }, [contained, setOverride]);
+  useEffect(() => {
+    if (DESKTOP_EDITION && desktopReady && hydrated && !contained) window.desktopPlayer?.skinChanged(effectiveId);
+  }, [contained, desktopReady, effectiveId, hydrated]);
 
   const selection = useMemo<SkinSelection>(
     () => ({
@@ -201,8 +225,10 @@ function ShellChrome({ skin, contained }: { skin?: SkinComponent; contained: boo
             <div className={auth.phase === 'prompt' ? 'absolute inset-0 isolate' : 'contents'} inert={locked}>
               {/* Contain skin suspension here so the landing page does not replay its reveal and remain at opacity 0. */}
               <Suspense fallback={null}>
-                <Skin contained={contained} portalNode={portalNode} />
-                <RevealWhenMounted ready={hydrated} />
+                {DESKTOP_EDITION && !contained
+                  ? <DesktopSurface><Skin contained={contained} portalNode={portalNode} /></DesktopSurface>
+                  : <Skin contained={contained} portalNode={portalNode} />}
+                <RevealWhenMounted ready={hydrated && (contained || desktopReady)} />
               </Suspense>
             </div>
             <StationPasswordGate phase={auth.phase} unlock={auth.unlock} savedRejected={auth.savedRejected} solid={false} />

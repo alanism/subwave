@@ -74,7 +74,7 @@ export const PRESS_RUN_PLATES: readonly PressRunPlate[] = [
     'A hi-fi stack drawn at 30° — the switch, knob and keys in the drawing are the controls.',
     'riso', 'Riso'),
   plate(9, 'enochian', 'Enochian',
-    'A tactile receiver — Ivory and Obsidian finishes, Cinnabar power, and a weighted volume dial.',
+    'The original Enochian controls — native knobs, ribbed slider, receiver power, Input Selector keys and display.',
     'enochian-ivory', 'Enochian Ivory'),
 ];
 

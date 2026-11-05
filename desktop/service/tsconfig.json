@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES2023", "lib": ["ES2023", "DOM"], "module": "ESNext", "moduleResolution": "Bundler",
+    "strict": true, "noEmit": true, "skipLibCheck": true,
+    "types": ["node"], "typeRoots": ["../node_modules/@types"],
+    "paths": { "zod": ["../node_modules/zod"] }
+  },
+  "include": ["*.ts"]
+}

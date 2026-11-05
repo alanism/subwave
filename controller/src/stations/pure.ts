@@ -47,6 +47,7 @@ export function duplicateAction(entry: string): 'copy' | 'skip' {
 // install-level entries stay at the root (spec §2).
 const INSTALL_LEVEL = new Set([
   'stations', 'icecast-secrets.env', 'hf-cache', 'analyze-tmp', 'lost+found',
+  'youtube-imports', 'Recent YT downloads',
 ]);
 
 export function conversionAction(entry: string): 'move' | 'keep' {

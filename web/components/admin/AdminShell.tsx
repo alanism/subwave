@@ -44,6 +44,7 @@ import {
   Telescope,
 } from 'lucide-react';
 import { useAdminAuth } from '../../lib/adminAuth';
+import { DESKTOP_EDITION } from '../../lib/desktop';
 import type { SignInResult } from '../../lib/adminAuth';
 import type { AdminFetch } from '../../lib/admin-query';
 import AdminQueryProvider from './AdminQueryProvider';
@@ -161,6 +162,7 @@ const NAV_SECTIONS: NavSection[] = [
         icon: Disc3,
         children: [
           { href: '/admin/playlists', id: 'playlists', label: 'Playlists', icon: ListMusic },
+          { href: '/admin/youtube', id: 'youtube', label: 'YouTube imports', icon: Disc3 },
           { href: '/observatory', id: 'observatory', label: 'Observatory', icon: Telescope },
         ],
       },
@@ -252,6 +254,7 @@ const FOOTER_LINKS: { href: string; label: string; icon: NavIcon; pill: string }
 // Playlists, DJ Doc and Stations aren't sidebar items, so they're resolved
 // explicitly; their crumb sections mirror where the rail stays lit.
 function resolveCrumb(pathname: string | null): { section?: string; page: string } {
+  if (pathname?.startsWith('/admin/youtube')) return { section: 'Programming', page: 'YouTube imports' };
   if (pathname?.startsWith('/admin/playlists')) return { section: 'Programming', page: 'Playlists' };
   if (pathname?.startsWith('/admin/shows/schedule')) return { section: 'Programming', page: 'Schedule' };
   if (pathname?.startsWith('/admin/doctor')) return { section: 'Monitor', page: 'DJ Doc' };
@@ -518,10 +521,10 @@ function AdminSidebar({
                       </DropdownMenuItem>
                     );
                   })}
-                  <DropdownMenuItem onClick={() => setConfirmingSignOut(true)}>
+                  {!DESKTOP_EDITION && <DropdownMenuItem onClick={() => setConfirmingSignOut(true)}>
                     <LogOut aria-hidden="true" />
                     Sign out
-                  </DropdownMenuItem>
+                  </DropdownMenuItem>}
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>

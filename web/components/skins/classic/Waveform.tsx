@@ -3,6 +3,7 @@
 import { memo, useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { useAnalyser } from '@/lib/hooks';
 import { pollWhileVisible } from '@/lib/poll';
+import { DESKTOP_EDITION } from '@/lib/desktop';
 
 const BARS = 120;
 
@@ -194,7 +195,7 @@ export default memo(function Waveform({ audioRef, tunedIn, trackStartedAt, durat
     if (calm || !tunedIn || !ready) {
       levels.fill(0);
       draw();
-      if (calm || !tunedIn) return;
+      if (calm || !tunedIn || DESKTOP_EDITION) return;
       // rAF also pauses in a hidden tab, as the interval it replaced did.
       let walkRaf = 0;
       let lastStep = 0;
@@ -235,6 +236,7 @@ export default memo(function Waveform({ audioRef, tunedIn, trackStartedAt, durat
       } else {
         if (deadSince == null) deadSince = now;
         if (now - deadSince >= DEAD_MS) {
+          if (DESKTOP_EDITION) { levels.fill(0); draw(); return; }
           // Walk at the fallback loop's cadence (WALK_MS).
           if (now - lastWalk >= WALK_MS) {
             lastWalk = now;
@@ -270,6 +272,7 @@ export default memo(function Waveform({ audioRef, tunedIn, trackStartedAt, durat
 
   return (
     <div
+      data-local-waveform={DESKTOP_EDITION ? true : undefined}
       // The band's vertical shape is gated on viewport HEIGHT as well as width
       // (#576). The two wide variants use mutually exclusive height queries so
       // neither depends on class order to win.

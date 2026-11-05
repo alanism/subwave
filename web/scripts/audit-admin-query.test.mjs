@@ -10,6 +10,10 @@ const audit = path.resolve(import.meta.dirname, 'audit-admin-query.mjs');
 // The production audit deliberately fails stale imperative entries, so an
 // isolated ownership fixture supplies one exact call for every classification.
 const validImperativeFixtures = {
+  'youtube/YoutubePanel.tsx': `export async function save(adminFetch, id) {
+    // admin-query-imperative: youtube-mp3-download
+    return adminResponse(adminFetch, \`/youtube/downloads/\${id}/file\`);
+  }`,
   'AdminShell.tsx': `export async function run() {
   // admin-query-imperative: first-run-redirect
   return fetch('/api/onboarding/status');

@@ -9,6 +9,7 @@ import { useDynamicStyle } from '../hooks/useDynamicStyle';
 import { useLiteMode } from '../hooks/useLiteMode';
 import { useThemeSwitcher } from './ThemeProvider';
 import { useSkinSelection } from './skins/SkinContext';
+import { DESKTOP_EDITION } from '@/lib/desktop';
 
 // The skin miniatures only matter once the menu is open, so they load with it
 // rather than riding every skin's first paint; hovering or focusing the trigger
@@ -251,8 +252,8 @@ export default function ThemeSwitcher({ variant = 'player', className }: ThemeSw
                     ? (themes.find(t => t.id === stationActiveId)?.name ?? stationActiveId)
                     : null
                 }
-                resetLabel="Use station default"
-                followingLabel="Station default"
+                resetLabel={DESKTOP_EDITION ? 'Use default palette' : 'Use station default'}
+                followingLabel={DESKTOP_EDITION ? 'Default palette' : 'Station default'}
                 onReset={() => ctx.setOverride(null)}
               />
               {/* One row: the tiles widen to fill it, then hold at a square and
@@ -305,8 +306,8 @@ export default function ThemeSwitcher({ variant = 'player', className }: ThemeSw
                   label="Player skin"
                   overridden={!!skinCtx.overrideId}
                   stationName={skinCtx.skins.find(s => s.id === skinCtx.stationSkinId)?.name ?? skinCtx.stationSkinId}
-                  resetLabel="Use station skin"
-                  followingLabel="Station skin"
+                  resetLabel={DESKTOP_EDITION ? 'Use default skin' : 'Use station skin'}
+                  followingLabel={DESKTOP_EDITION ? 'Default skin' : 'Station skin'}
                   onReset={() => {
                     skinCtx.setOverride(null);
                     setOpen(false);

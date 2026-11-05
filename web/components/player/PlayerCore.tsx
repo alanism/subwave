@@ -44,6 +44,9 @@ export interface PlayerActions {
   play: () => void;
   pause: () => void;
   stop: () => void;
+  isTunedIn: () => boolean;
+  /** Explicit transport commands invalidate a pending local source change. */
+  transportIntent: Readonly<RefObject<number>>;
   /** The station gate took this listener off the air and holds them for the right password
    *  (lib/gateResume.ts). Written only by the gate; `pause` and `stop` drop it, because any other
    *  tune-out does. Here rather than in the gate so a Media Session command under the prompt reaches
@@ -105,6 +108,7 @@ export function PlayerCoreProvider({ children }: { children: ReactNode }) {
     play,
     pause,
     stop,
+    isTunedIn,
     toggleMute,
     muted,
     idleStopped,
@@ -121,22 +125,29 @@ export function PlayerCoreProvider({ children }: { children: ReactNode }) {
   const pauseRef = useRef(pause);
   const stopRef = useRef(stop);
   const muteRef = useRef(toggleMute);
+  const tunedInCheckRef = useRef(isTunedIn);
+  const transportIntent = useRef(0);
   tuneRef.current = tune;
   playRef.current = play;
   pauseRef.current = pause;
   stopRef.current = stop;
   muteRef.current = toggleMute;
+  tunedInCheckRef.current = isTunedIn;
   const gateHoldRef = useRef(false);
 
   const actions = useMemo<PlayerActions>(
     () => ({
-      tune: () => tuneRef.current(),
-      play: () => playRef.current(),
+      transportIntent,
+      isTunedIn: () => tunedInCheckRef.current(),
+      tune: () => { transportIntent.current++; tuneRef.current(); },
+      play: () => { transportIntent.current++; playRef.current(); },
       pause: () => {
+        transportIntent.current++;
         gateHoldRef.current = false;
         pauseRef.current();
       },
       stop: () => {
+        transportIntent.current++;
         gateHoldRef.current = false;
         stopRef.current();
       },

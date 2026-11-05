@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; form-action 'none'; base-uri 'none'">
+  <title>Subwave — Station connection</title>
+  <link rel="stylesheet" href="connection.css">
+  <script src="connection.js" defer></script>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">SUB/WAVE · LINUX</p>
+    <h1>Your station.</h1>
+    <p>Connect this player to a Subwave station on this computer, your network, or the internet.</p>
+    <form id="connection-form">
+      <label for="station">Station address</label>
+      <input id="station" name="station" type="url" placeholder="http://localhost:7700" autocomplete="url" required maxlength="2048" autofocus>
+      <p class="hint">Use the station’s main address. Its radio service must be running.</p>
+      <p id="status" role="status" aria-live="polite"></p>
+      <div class="actions"><button type="button" id="check">Test connection</button><button type="submit" id="save">Save station</button></div>
+    </form>
+    <p class="foot">Choose Original or Enochian from the Skin menu.<br>YouTube imports use this station’s download service.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Add to the standard Compose stack to enable station-library imports.
+# Downloads alone work in the normal persistent state volume.
+services:
+  controller:
+    environment:
+      YT_LIBRARY_PATH: /youtube-library
+    volumes:
+      - type: bind
+        source: ${YT_LIBRARY_HOST:?Set YT_LIBRARY_HOST to your Navidrome music root}
+        target: /youtube-library
+        read_only: false

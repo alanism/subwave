@@ -92,6 +92,12 @@ RUN apt-get update -qq \
  && icecast2 -v 2>&1 | grep -q -- '-kh' \
  && rm -rf /var/lib/apt/lists/*
 
+# YouTube MP3 imports. EJS is bundled by the official default dependency set.
+ARG YT_DLP_VERSION=2026.08.19
+RUN python3 -m venv /opt/yt-dlp \
+    && /opt/yt-dlp/bin/pip install --no-cache-dir "yt-dlp[default]==${YT_DLP_VERSION}"
+ENV YT_DLP_PATH=/opt/yt-dlp/bin/yt-dlp
+
 # Node.js 22 — lifted from the official image (a bookworm build copied into a
 # trixie runtime: Node's non-glibc parts make the cross-distro copy fine) rather than
 # NodeSource's apt repo, whose CDN serves per-IP 403s

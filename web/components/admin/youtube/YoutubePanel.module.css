@@ -1,0 +1,80 @@
+/* Page arrangement only. Authored controls keep vendor/controls.css intact. */
+.panel { max-width: 1180px; margin: 0 auto; padding: 36px 28px 64px; color: var(--ink); font-family: "IBM Plex Sans", sans-serif; line-height: normal; }
+.panel :global(.source) { display: contents; }
+/* Restore the atlas browser default removed by Tailwind's reset. */
+.panel :global(.rs-field input) { padding: 1px 2px; }
+/* The authored input clears its own outline; keep keyboard focus visible. */
+.panel :global(.rs-field:focus-within) { outline: 3px solid var(--accent); outline-offset: 4px; }
+:global(html[data-theme="dark"]) .panel :global(.source) { --ink: #f7f7f8; --muted: #aaaab0; --tile: #171719; --paper: #09090a; --line: #3a3a3e; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 32px; }
+.header h1 { font-size: clamp(30px,4vw,44px); margin: 6px 0 10px; font-weight: 700; letter-spacing: -1.5px; }
+.header h1 span { color: #cc0000; }
+.header p { color: var(--muted); margin: 0; }
+.eyebrow { font: 500 10px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 1.5px; }
+.panel h2 { font-size: 21px; font-weight: 600; margin: 0 0 16px; }
+.panel h3 { font-size: 17px; font-weight: 600; margin: 5px 0; }
+.searchSection { padding: 24px; background: var(--surface); margin-bottom: 44px; }
+.searchRow { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; }
+.searchAction { display:flex; align-items:center; justify-content:flex-end; }
+.classicSearch { width:100%; min-height:44px; padding:10px 12px; background:var(--field); border:1px solid var(--line); color:var(--ink); font-size:15px; }
+.classicSearch:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+.preferences { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 28px; align-items: start; }
+.switchRow { display: flex; align-items: center; gap: 6px; }
+.switchRow > span { font-size: 13px; color: var(--muted); }
+.results { margin-top: 24px; border-top: 1px solid var(--line); }
+.result { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); }
+.result a { font-size: 18px; font-weight: 600; text-decoration: none; }
+.result a:hover { text-decoration: underline; }
+.result p, .download p { margin: 6px 0; }
+.result small, .download small { color: var(--muted); font: 400 11px "IBM Plex Mono", monospace; }
+.collectionHeader { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 12px; }
+.collectionHeader h2 { margin-top: 7px; margin-bottom: 0; }
+.filter { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
+.filter select { max-width: 250px; padding: 8px; background: var(--field); color: var(--ink); border: 1px solid var(--line); }
+.help { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+.notice { padding: 14px 16px; margin: 16px 0; border: 1px solid var(--line); background: var(--surface); font-size: 13px; }
+.notice a, .notice button { color: var(--ink); text-decoration: underline; cursor: pointer; }
+.download { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 24px 0; border-top: 1px solid var(--line); }
+.downloadInfo { min-width: 0; overflow-wrap: anywhere; }
+.status { font: 500 10px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.downloadActions { display: flex; align-items: center; flex-shrink: 0; gap: 16px; }
+.addForm { width: 240px; display: flex; flex-direction: column; gap: 12px; }
+.empty { padding: 36px 24px; background: var(--surface); color: var(--muted); font-size: 14px; }
+.error { color: var(--accent); font-size: 13px; overflow-wrap: anywhere; }
+.warning { display: block; color: var(--muted); font-size: 12px; margin-top: 6px; }
+.routeEditor { border: 1px solid var(--line); padding: 24px; margin-bottom: 28px; }
+.routeEditor > p { margin-bottom: 24px; color: var(--muted); font-size: 13px; }
+.route { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; margin: 0 0 28px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.route legend { font: 500 11px "IBM Plex Mono", monospace; color: var(--muted); }
+.routeButtons { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+.routeButtons a { font-size: 13px; text-decoration: underline; }
+.setup { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.setup summary { cursor: pointer; }
+.setup p { margin: 14px 0; }
+.setup code { overflow-wrap: anywhere; }
+.panel[data-desktop="true"] { padding:32px 32px 48px; }
+.panel[data-desktop="true"] .searchRow { grid-template-columns:repeat(6,minmax(0,1fr)); gap:24px; }
+.panel[data-desktop="true"] .searchRow > :first-child { grid-column:span 4; min-width:0; }
+.panel[data-desktop="true"] .searchAction { grid-column:span 2; }
+.panel[data-desktop="true"] .preferences { grid-template-columns:repeat(6,minmax(0,1fr)); gap:32px; }
+.panel[data-desktop="true"] .preferences > * { grid-column:span 3; }
+.panel[data-desktop="true"] .download { align-items:flex-start; flex-direction:column; gap:16px; }
+.panel[data-desktop="true"] .downloadActions { flex-wrap:wrap; width:100%; flex-shrink:1; }
+.panel[data-desktop="true"] .result > :first-child { min-width:0; overflow-wrap:anywhere; }
+.panel[data-desktop="true"] .download:focus-visible { outline:3px solid var(--accent); outline-offset:4px; }
+.panel[data-skin="classic"] .searchSection { border:1px solid var(--line); }
+.panel[data-skin="classic"] .downloadActions { align-items:flex-end; }
+@media (max-width: 760px) {
+  .panel { padding: 24px 16px 40px; }
+  .header, .collectionHeader { align-items: flex-start; flex-direction: column; gap: 16px; }
+  .searchSection { padding: 20px 12px; }
+  .preferences, .route { grid-template-columns: 1fr; gap: 22px; }
+  .searchRow { grid-template-columns: minmax(0,1fr); }
+  .download { align-items: flex-start; flex-direction: column; }
+  .downloadActions { width: 100%; gap: 20px; flex-direction: column; align-items: flex-start; }
+  .addForm { width: 100%; min-width: 0; }
+  .result a { font-size: 16px; }
+  .panel[data-desktop="true"] { padding:24px 24px 40px; }
+  .panel[data-desktop="true"] .searchRow > :first-child,.panel[data-desktop="true"] .searchAction,.panel[data-desktop="true"] .preferences > * { grid-column:span 6; }
+  .panel[data-desktop="true"] .searchAction { justify-content:flex-start; }
+}

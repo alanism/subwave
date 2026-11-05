@@ -32,6 +32,8 @@ import { useTuneInGate } from '@/components/player/useTuneInGate';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useLyricsPreference, useTrackLyrics } from '@/components/skins/lyrics';
 import { useStationClient } from '@/lib/stationClient';
+import { DESKTOP_EDITION } from '@/lib/desktop';
+import { useDesktopSurface } from '@/components/desktop/DesktopContext';
 import type { SkinProps } from '@/components/skins/types';
 import type { QueueEntry, RequestResult } from '@/lib/types';
 
@@ -50,6 +52,7 @@ const BOOTH_ICON = <Mic size={18} strokeWidth={1.5} />;
 const SCHEDULE_ICON = <CalendarClock size={18} strokeWidth={1.5} />;
 
 export default function ClassicSkin({ portalNode }: SkinProps) {
+  const desktop = useDesktopSurface();
   const client = useStationClient();
   const {
     nowPlaying, context, dj, activeShow, listeners, llmTokens,
@@ -77,9 +80,9 @@ export default function ClassicSkin({ portalNode }: SkinProps) {
 
   // Stable handlers + counts for the memoized layout components, so a feed
   // update that doesn't touch them costs no re-render.
-  const openSchedule = useCallback(() => setDrawer('schedule'), []);
-  const openBooth = useCallback(() => setDrawer('booth'), []);
-  const openTimeline = useCallback(() => setDrawer('timeline'), []);
+  const openSchedule = useCallback(() => { if (desktop) desktop.openPanel('stations'); else setDrawer('schedule'); }, [desktop]);
+  const openBooth = useCallback(() => { if (desktop) desktop.openPanel('library'); else setDrawer('booth'); }, [desktop]);
+  const openTimeline = useCallback(() => { if (desktop) desktop.openPanel('library'); else setDrawer('timeline'); }, [desktop]);
   const upcomingCount = state.upcoming?.length ?? 0;
   const dotRailCounts = useMemo(
     () => ({
@@ -160,16 +163,16 @@ export default function ClassicSkin({ portalNode }: SkinProps) {
       arrowup: () => adjustVolume(0.05),
       arrowdown: () => adjustVolume(-0.05),
       m: toggleMute,
-      '1': () => setDrawer('timeline'),
-      '2': () => setDrawer('booth'),
-      '3': () => setDrawer('request'),
-      '4': () => setDrawer('schedule'),
+      '1': openTimeline,
+      '2': openBooth,
+      '3': () => { if (desktop) desktop.openPanel('youtube'); else setDrawer('request'); },
+      '4': openSchedule,
       ...(lyricsOn ? { l: toggleLyrics } : {}),
-      r: () => setDrawer('request'),
-      '?': () => setShortcutsOpen(true),
-      'mod+k': () => setPaletteOpen(o => !o),
+      r: () => { if (desktop) desktop.openPanel('youtube'); else setDrawer('request'); },
+      '?': () => { if (desktop) desktop.openPanel('settings'); else setShortcutsOpen(true); },
+      'mod+k': () => { if (desktop) desktop.openPanel('library'); else setPaletteOpen(o => !o); },
     },
-    { disabled: paletteOpen || shortcutsOpen },
+    { disabled: paletteOpen || shortcutsOpen || !!desktop?.panel },
   );
 
   // The controller returns a request id immediately; matching runs in the booth
@@ -233,7 +236,7 @@ export default function ClassicSkin({ portalNode }: SkinProps) {
         duration={nowPlaying?.duration ?? 0}
       />
 
-      <DotRail counts={dotRailCounts} active={drawer} onSelect={setDrawer} />
+      {!DESKTOP_EDITION && <DotRail counts={dotRailCounts} active={drawer} onSelect={setDrawer} />}
 
       <TransportBar
         tunedIn={tunedIn}

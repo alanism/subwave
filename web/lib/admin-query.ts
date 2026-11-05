@@ -12,6 +12,7 @@ import {
 } from '@tanstack/react-query';
 import { errorMessage, notify } from './notify';
 import { runAdminRead } from './admin-read';
+import { DESKTOP_EDITION } from './desktop';
 
 export type AdminFetch = (path: string, init?: RequestInit) => Promise<Response>;
 
@@ -49,7 +50,7 @@ export async function adminResponse(
   } catch (error) {
     if ((signal ?? init?.signal)?.aborted) throw (signal ?? init?.signal)?.reason;
     if (error instanceof TypeError) {
-      throw new Error('Could not reach the controller. Check the station address and your connection, then retry.', { cause: error });
+      throw new Error(DESKTOP_EDITION ? 'The local music service is unavailable. Retry in a moment. Your saved songs are kept.' : 'Could not reach the controller. Check the station address and your connection, then retry.', { cause: error });
     }
     throw error;
   }
@@ -62,7 +63,7 @@ export async function adminResponse(
       ? body.message
       : '';
   const detail = actionable ? `: ${actionable}` : '';
-  throw new AdminResponseError(`${path} failed (${response.status})${detail}`, response.status, body);
+  throw new AdminResponseError(DESKTOP_EDITION ? actionable || 'This action could not be completed. Try again.' : `${path} failed (${response.status})${detail}`, response.status, body);
 }
 
 export async function adminJson<T>(
