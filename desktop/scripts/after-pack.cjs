@@ -1,4 +1,4 @@
-const { cp, access, rm } = require('node:fs/promises');
+const { cp, access, rm, writeFile, readFile } = require('node:fs/promises');
 const { join, resolve } = require('node:path');
 
 // Generic packager resource filters omit nested node_modules. Next's traced
@@ -15,5 +15,9 @@ module.exports = async ({ appOutDir }) => {
   await rm(serviceTarget, { recursive: true, force: true });
   await cp(serviceSource, serviceTarget, { recursive: true, dereference: true });
   await access(join(serviceTarget, 'station.cjs'));
+  await access(join(serviceTarget, 'agent.cjs'));
+  await access(join(serviceTarget, 'agent-tools.cjs'));
+  await access(join(serviceTarget, 'THIRD_PARTY_NOTICES.txt'));
+  await writeFile(join(appOutDir, 'subwave-agent'), await readFile(join(__dirname, 'launch-agent.sh')), { mode: 0o755 });
   console.log('Verified complete desktop interface and bundled local station runtime.');
 };

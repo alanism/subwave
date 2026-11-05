@@ -29,6 +29,8 @@ cli/dist/
 
 # Runtime state — file-based IPC, TTS output, archives, logs
 state/
+agent-connection.json
+agent-connection.json.*.tmp
 
 # Claude Code worktrees + local runtime files
 .claude/worktrees/

@@ -7,6 +7,8 @@ const { join } = require('node:path');
 const { ConfigStore, stationUrl, SKINS } = require('./config.cjs');
 const { startGateway } = require('./gateway.cjs');
 const { LocalService } = require('./local-service.cjs');
+const { AgentServer } = require('./agent-server.cjs');
+const { randomUUID } = require('node:crypto');
 
 app.setName('Subwave');
 if (process.env.SUBWAVE_DESKTOP_DATA_DIR) app.setPath('userData', process.env.SUBWAVE_DESKTOP_DATA_DIR);
@@ -20,7 +22,20 @@ const config = new ConfigStore(join(dataDir, 'preferences.json'));
 const panels = new Set(['youtube', 'library', 'stations', 'settings']);
 const panelFromArgs = args => args.includes('--settings') ? 'settings' : args.includes('--youtube') ? 'youtube' : args.includes('--library') ? 'library' : args.includes('--stations') ? 'stations' : null;
 let currentPanel = panelFromArgs(process.argv);
-let player, runtime, gateway, local, musicDir, openingFiles, quitting = false, shutdownStarted = false;
+let player, runtime, gateway, local, agent, musicDir, openingFiles, quitting = false, shutdownStarted = false;
+let agentReady = false;
+const agentRequests = new Map();
+async function invokeAgentPlayer(action, args) {
+  const deadline = Date.now() + 10_000;
+  while (!agentReady && Date.now() < deadline && !shutdownStarted) await new Promise(resolve => setTimeout(resolve, 50));
+  if (!agentReady || !player || player.isDestroyed() || shutdownStarted) throw new Error('The player is not ready. Open Subwave and retry.');
+  const id = randomUUID();
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => { agentRequests.delete(id); reject(new Error('The player did not confirm this action. Check its current state before retrying.')); }, 20_000);
+    agentRequests.set(id, { resolve, reject, timer });
+    player.webContents.send('player:agent-command', { id, action, args });
+  });
+}
 let remoteStation = '', apiOverride;
 const preload = join(__dirname, 'preload.cjs');
 const asset = name => join(__dirname, '../assets', name);
@@ -111,6 +126,7 @@ function buildMenu() {
     { role: 'editMenu' },
     { label: 'View', submenu: [{ role: 'reload' }, { role: 'resetZoom' }, { role: 'zoomIn' }, { role: 'zoomOut' }, { type: 'separator' }, { role: 'togglefullscreen' }] },
     { label: 'Help', submenu: [
+      { label: 'Agent controls (Aya / Hermes)', enabled: !!agent, click: () => { if (gateway) void shell.openExternal(`${gateway.origin}/agent`); } },
       { label: 'Open music folder', enabled: !!local, click: () => { void shell.openPath(musicDir); } },
       { label: 'Open desktop logs', click: () => { void shell.openPath(logPath); } },
       { label: 'About Subwave', click: () => dialog.showMessageBox(player, { type: 'info', title: 'Subwave', message: 'Subwave for Linux',
@@ -119,6 +135,14 @@ function buildMenu() {
   ]));
 }
 function registerIpc() {
+  ipcMain.on('player:agent-ready', event => { if (trusted(event)) agentReady = true; });
+  ipcMain.handle('player:agent-reply', (event, value) => {
+    if (!trusted(event) || !value || typeof value.id !== 'string') throw new Error('Unavailable');
+    const pending = agentRequests.get(value.id); if (!pending) return;
+    clearTimeout(pending.timer); agentRequests.delete(value.id);
+    if (typeof value.error === 'string') pending.reject(new Error(value.error.slice(0, 1200)));
+    else pending.resolve(value.result);
+  });
   ipcMain.handle('player:skin', event => { if (!trusted(event)) throw new Error('Unavailable'); return config.value.skin; });
   ipcMain.on('player:skin-changed', (event, skin) => {
     if (!trusted(event) || !SKINS.includes(skin)) return;
@@ -183,8 +207,13 @@ async function boot() {
   }
   if (shutdownStarted) return;
   const web = await startWeb(); if (shutdownStarted) return;
+  if (local) {
+    const toolsRoot = app.isPackaged ? join(process.resourcesPath, 'service') : join(__dirname, '../runtime/service');
+    agent = new AgentServer({ dataDir, tools: require(join(toolsRoot, 'agent-tools.cjs')), getLocal: () => local?.endpoint(),
+      importFiles: (paths, stationId) => local.importFiles(paths, stationId), player: invokeAgentPlayer });
+  }
   gateway = await startGateway({ port: config.value.port, getStation: () => remoteStation || local?.origin || '',
-    getLocal: () => local?.endpoint(), web, apiOverride, localThemes: require('../assets/themes.json') });
+    getLocal: () => local?.endpoint(), web, apiOverride, localThemes: require('../assets/themes.json'), agent });
   await config.save({ port: gateway.port }); registerIpc();
   player = new BrowserWindow({ title: 'Subwave', ...config.value.bounds, minWidth: 800, minHeight: 620, show: false,
     backgroundColor: '#f3eee4', icon: asset('icon.png'),
@@ -200,7 +229,9 @@ async function boot() {
   player.on('closed', () => { player = null; });
   player.once('ready-to-show', () => { player.show(); log('window-ready', gateway.origin); });
   player.webContents.on('did-finish-load', () => log('page-loaded', new URL(player.webContents.getURL()).pathname));
-  buildMenu(); await player.loadURL(`${gateway.origin}/listen`); log('player-started', gateway.origin);
+  player.webContents.on('did-start-loading', () => { agentReady = false; });
+  buildMenu(); await player.loadURL(`${gateway.origin}/listen`);
+  await agent?.publish(gateway.origin); log('player-started', gateway.origin);
 }
 
 if (!app.requestSingleInstanceLock()) app.quit();
@@ -218,7 +249,9 @@ app.on('before-quit', event => {
       if (player && !player.isDestroyed() && !player.isMaximized() && !player.isFullScreen()) {
         const { width, height } = player.getBounds(); await config.save({ bounds: { width, height } }).catch(() => {});
       }
-      await config.pending.catch(() => {}); await gateway?.close(); await local?.close();
+      for (const pending of agentRequests.values()) { clearTimeout(pending.timer); pending.reject(new Error('Subwave is closing.')); }
+      agentRequests.clear(); agentReady = false;
+      await config.pending.catch(() => {}); await agent?.close(); await gateway?.close(); await local?.close();
       if (runtime) {
         const stopped = new Promise(resolve => runtime.once('exit', resolve)); runtime.kill();
         await Promise.race([stopped, new Promise(resolve => setTimeout(resolve, 1500))]);

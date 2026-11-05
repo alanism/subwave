@@ -34,4 +34,16 @@ contextBridge.exposeInMainWorld('desktopPlayer', {
     ipcRenderer.on('player:panel', listener);
     return () => ipcRenderer.removeListener('player:panel', listener);
   },
+  onAgentCommand: callback => {
+    const actions = ['status', 'play-track', 'play-source', 'play-download', 'stop', 'next', 'set-volume'];
+    const listener = (_event, value) => {
+      if (!value || typeof value.id !== 'string' || !actions.includes(value.action) || !value.args || typeof value.args !== 'object') return;
+      void Promise.resolve().then(() => callback(value.action, value.args)).then(
+        result => ipcRenderer.invoke('player:agent-reply', { id: value.id, result }),
+        error => ipcRenderer.invoke('player:agent-reply', { id: value.id, error: error instanceof Error ? error.message : String(error) }),
+      ).catch(() => {});
+    };
+    ipcRenderer.on('player:agent-command', listener); ipcRenderer.send('player:agent-ready');
+    return () => ipcRenderer.removeListener('player:agent-command', listener);
+  },
 });

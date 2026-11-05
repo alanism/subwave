@@ -1,6 +1,6 @@
 # Subwave owner’s manual
 
-**Linux desktop edition · version 1.1.6 · Original + Enochian**
+**Linux desktop edition · version 1.2.1 · Original + Enochian**
 
 Subwave plays music saved on your computer. It also searches YouTube, downloads MP3s and organizes them into separate genre radio stations. Your local station starts with the app. You do not need an admin login or a separately configured server.
 
@@ -15,6 +15,7 @@ Subwave plays music saved on your computer. It also searches YouTube, downloads 
 - [Search YouTube and keep an MP3](#search-youtube-and-keep-an-mp3)
 - [Appearance and window controls](#appearance-and-window-controls)
 - [Keyboard controls](#keyboard-controls)
+- [Let Aya or Hermes control Subwave](#let-aya-or-hermes-control-subwave)
 - [Your files and settings](#your-files-and-settings)
 - [Backup and restore](#backup-and-restore)
 - [Troubleshooting](#troubleshooting)
@@ -204,6 +205,16 @@ Shortcuts apply while Subwave is the active application.
 | Quit | Ctrl+Q |
 
 Use **Tab / Shift+Tab** to move between controls, **Enter** to submit forms and **Space** to activate focused buttons/switches. In the genre selector, arrows move between exclusive choices and **Home / End** choose first/last. Focus the Enochian knob or slider to use arrows for volume; **Home / End** set minimum/maximum. The slider also supports **Page Up / Page Down** for larger steps.
+
+## Let Aya or Hermes control Subwave
+
+Keep Subwave open. Choose **Help → Agent controls (Aya / Hermes)** to open the local control page. It can search your library or YouTube, download MP3s, add songs to the selected genre, and operate the actual native player. Playback stays in Subwave; the page does not start a second audio player.
+
+Aya needs access to this connected computer through the OpenAI desktop app. Ask it to open the Subwave agent page or use the installed `subwave-agent` command. A dot running only on its cloud computer cannot use your local music service.
+
+Hermes uses the bundled MCP connection. Once connected, ask it to find a local song, search YouTube for a missing recording, add the MP3 to Jazz, build a playlist or change the player volume. New downloads are asynchronous: the agent should check the job until ready before claiming that a song was added or played.
+
+The tools preserve downloaded originals and use the same genre/playlist rules as the app. Specify the intended recording if search results are ambiguous. For connection instructions and the complete tool catalog, see [Agent controls](docs/agents.md).
 
 ## Your files and settings
 

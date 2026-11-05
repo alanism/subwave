@@ -4,6 +4,8 @@
 // origin receives its private capability; remote QA traffic keeps its contract.
 const http = require('node:http');
 const https = require('node:https');
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
 
 const streams = new Set(['/stream.mp3', '/stream.opus', '/stream.aac', '/stream.flac']);
 function routeTarget(path, { station, apiOverride, web }) {
@@ -69,12 +71,33 @@ async function themesResponse(res, station, apiOverride, localThemes, local) {
   res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
   res.end(JSON.stringify({ ...remote, themes: [...themes.values()], active }));
 }
-async function startGateway({ port, getStation, getLocal = () => null, apiOverride, web, localThemes = [] }) {
+async function startGateway({ port, getStation, getLocal = () => null, apiOverride, web, localThemes = [], agent = null }) {
   let origin;
   const server = http.createServer((req, res) => {
     // Block DNS rebinding and cross-site access to the local station proxy.
     if (req.headers.host !== new URL(origin).host || (req.headers.origin && req.headers.origin !== origin) || req.headers['sec-fetch-site'] === 'cross-site') {
       res.writeHead(403); return res.end('Local player access only');
+    }
+    const agentPath = req.url?.split('?')[0];
+    if (agent && ['/agent', '/agent/console.js', '/agent/console.css'].includes(agentPath) && req.method === 'GET') {
+      const [file, type] = agentPath === '/agent' ? ['index.html', 'text/html'] : agentPath.endsWith('.js') ? ['console.js', 'text/javascript'] : ['console.css', 'text/css'];
+      res.writeHead(200, { 'Content-Type': `${type}; charset=utf-8`, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
+        'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'none'; form-action 'self'" });
+      res.end(readFileSync(join(__dirname, '../assets/agent', file))); return;
+    }
+    if (agent && (agentPath === '/api/agent/tools' || agentPath === '/api/agent/call')) {
+      const send = (status, value) => { res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }); res.end(JSON.stringify(value)); };
+      if (!agent.allowed(req, origin)) { send(401, { ok: false, error: 'Use the local agent page or the private subwave-agent connection.' }); return; }
+      if (req.method === 'GET' && agentPath === '/api/agent/tools') { send(200, { tools: agent.list() }); return; }
+      if (req.method !== 'POST' || agentPath !== '/api/agent/call') { send(405, { ok: false, error: 'Method not allowed' }); return; }
+      void (async () => {
+        let raw = '';
+        for await (const chunk of req) { raw += chunk; if (Buffer.byteLength(raw) > 262144) throw new Error('Agent request is too large'); }
+        const value = JSON.parse(raw);
+        if (typeof value.name !== 'string') throw new Error('Provide a tool name and arguments object.');
+        send(200, { ok: true, result: await agent.call(value.name, value.arguments) });
+      })().catch(error => { if (!res.headersSent) send(400, { ok: false, error: error.message }); });
+      return;
     }
     const station = getStation();
     const local = getLocal();

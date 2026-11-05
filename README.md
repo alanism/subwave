@@ -6,7 +6,7 @@ Open Subwave from your Linux Apps menu. Its local music service starts with the 
 
 This desktop edition is developed from [perminder-klair/subwave](https://github.com/perminder-klair/subwave). It starts without an account, admin login, station address, Docker or a separately configured radio server. The inherited web radio and server code remains in the repository; its setup is documented separately in [README.upstream.md](README.upstream.md).
 
-[Owner’s manual](owners_manual.md) · [Desktop build notes](desktop/README.md) · [Enochian source fidelity](docs/enochian-design.md)
+[Owner’s manual](owners_manual.md) · [Agent controls](docs/agents.md) · [Desktop build notes](desktop/README.md) · [Enochian source fidelity](docs/enochian-design.md)
 
 ## Two skins, one music library
 
@@ -37,6 +37,7 @@ These are installed-app captures using an isolated test library. Changing skins 
 | Genre sorting | Match video tags, title and description to genre rules. Unclear matches wait for a manual destination. |
 | Recent downloads | Retain original YouTube MP3s after genre copies. Export another copy through the native save dialog. |
 | Desktop usability | Native menus, shortcuts, chooser/save dialogs, resizing, zoom and system media controls. |
+| Aya / Hermes | 21 shared tools for searching, downloads, genres, playlists and actual playback. Browser controls, JSON CLI and local stdio MCP. |
 | Local storage | Music and organization stay on the computer. Existing local music works offline; YouTube needs a connection. |
 
 Initial collections are **Jazz, House, Rock, Ambient and Local files**, plus an **All music** view. Create additional genres up to eight genre stations in total. A genre station is a local listening collection, independent of a YouTube uploader/channel.
@@ -93,6 +94,8 @@ mkdir -p "$SUBWAVE_RELEASE_DIR" "$SUBWAVE_APPS_DIR"
 cp -a desktop/dist/linux-unpacked/. "$SUBWAVE_RELEASE_DIR/"
 install -m 644 desktop/assets/icon.png "$SUBWAVE_INSTALL_DIR/icon.png"
 ln -sfn "releases/$SUBWAVE_VERSION" "$SUBWAVE_INSTALL_DIR/current"
+mkdir -p "$HOME/.local/bin"
+ln -sfn "$SUBWAVE_INSTALL_DIR/current/subwave-agent" "$HOME/.local/bin/subwave-agent"
 cat > "$SUBWAVE_APPS_DIR/subwave.desktop" <<EOF
 [Desktop Entry]
 Type=Application
@@ -110,6 +113,12 @@ fi
 ```
 
 Open **Subwave** from Apps. For updates, quit the app, build the new version and repeat the installation step. Back up the music and profile first. This edition currently uses manual updates.
+
+## Agent control
+
+Desktop **1.2.0** adds **Help → Agent controls (Aya / Hermes)**, a local browser page backed by the same 21 tools as the bundled `subwave-agent` JSON/MCP helper. Agents can search existing songs or YouTube, download and inspect MP3 jobs, add genre copies, edit playlists, and control the real native player.
+
+Hermes connects through local stdio MCP. Aya, the OpenAI dot, uses the local page or command through its connected-computer access. See [setup, examples and the tool catalog](docs/agents.md). Keep Subwave open; local computer access is required for Aya to reach this installation.
 
 ## Storage and backups
 
@@ -151,7 +160,7 @@ The gateway and station bind to loopback. The gateway privately authorizes its o
 
 Usability work draws on [Apple’s desktop guidance](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos): predictable menus, keyboard access, focus return, native file flows, resizing and readable recovery. Both skins keep their own visual identity. The supplied Ryo Lu, Jayse Hansen, GMUNK and Satori references informed the internal design review.
 
-For desktop **1.1.6**, verification included 644 interface tests, 11 desktop service tests, five Enochian control/source checks and 40 native layout combinations across both skins, two sizes and 100%/125% zoom. Checks covered real encoded audio, persistence, failed-operation recovery and a delayed Next/Stop race. Live YouTube search and MP3 downloads were exercised. Physical chooser/save and shortcut checks include owner confirmations; automated native dialog checks used controlled chooser/save return paths.
+For desktop **1.2.1**, verification included 644 interface tests, 17 desktop/service/agent tests, five Enochian control/source checks and 40 native layout combinations across both skins, two sizes and 100%/125% zoom. Checks covered real encoded audio, persistence, recovery, MCP discovery/calls, the installed launcher and transport races. The exact installed agent helper completed live YouTube search → MP3 download → genre add → native playback → cold relaunch. Browser tools and their form fallback were exercised as well. Earlier physical chooser/save and shortcut checks include owner confirmations; current automated native dialog checks used controlled chooser/save return paths.
 
 The fixed internal 20-criterion, five-level evaluation reached **95/100**. This is a project assessment, not an endorsement by the people named in the references. It does not establish every Linux distribution’s compatibility or guarantee future YouTube availability.
 

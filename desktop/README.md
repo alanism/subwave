@@ -12,6 +12,8 @@ The **Skin** menu switches between **Original** and **Enochian**. Appearance ins
 
 The **Player** menu opens **Library**, **Genre stations**, **YouTube downloads** and **Settings** inside the player. Opening or closing a panel keeps playback running. Closing the last window quits the app and stops its local services.
 
+Desktop 1.2.0 adds **Help → Agent controls (Aya / Hermes)** and a bundled `subwave-agent` helper. The local browser page, JSON commands and stdio MCP share 21 tools for music search, downloads, genre/playlist changes and native playback. See [agent setup and examples](../docs/agents.md).
+
 ## Add and play music
 
 **Open audio files** opens the native Linux file chooser. Select up to 50 MP3, FLAC, WAV, M4A, OGG, Opus or AAC files. Subwave prepares playable MP3 copies in its library and preserves your source files. The Library panel lets you choose a destination genre before importing; this does not switch the music currently playing.

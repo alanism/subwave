@@ -1,5 +1,9 @@
 # subwave-mcp
 
+**Linux desktop edition:** use the bundled `subwave-agent --mcp` helper and
+[desktop agent setup](../docs/agents.md) for Aya/Hermes, local music and YouTube
+downloads. The guide below covers the inherited radio/server tool set.
+
 [MCP](https://modelcontextprotocol.io) tools that let an agent drive the
 **SUB/WAVE** personal radio station — request songs, queue exact tracks, and
 put the AI DJ (voice, segments, skills, sound effects) on-air.

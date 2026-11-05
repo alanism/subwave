@@ -5,10 +5,11 @@ import dynamic from 'next/dynamic';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useQueryClient } from '@tanstack/react-query';
 import AdminQueryProvider from '@/components/admin/AdminQueryProvider';
-import { usePlayerActions } from '@/components/player/PlayerCore';
+import { usePlayerActions, usePlayerAudio } from '@/components/player/PlayerCore';
 import { useSkinSelection } from '@/components/skins/SkinContext';
 import { Button } from '@/components/ui/button';
-import type { DesktopCommand, DesktopPanel } from '@/lib/desktop';
+import type { DesktopAgentAction, DesktopCommand, DesktopPanel } from '@/lib/desktop';
+import type { DesktopLibrary } from '@/lib/schemas.generated';
 import { DesktopContext } from './DesktopContext';
 import { desktopKeys, useDesktopLibrary, useLocalCommand, type LocalCommand } from './queries';
 import { LibraryPanel, SettingsPanel, StationsPanel } from './DesktopPanels';
@@ -34,7 +35,8 @@ function Surface({ children }: { children: ReactNode }) {
   const command = useLocalCommand();
   const cache = useQueryClient();
   const skin = useSkinSelection();
-  const { play, stop, toggleMute, transportIntent, isTunedIn } = usePlayerActions();
+  const { play, stop, toggleMute, setVolume, transportIntent, isTunedIn } = usePlayerActions();
+  const { audioRef } = usePlayerAudio();
   const [panel, setPanel] = useState<DesktopPanel | null>(null);
   const [importing, setImporting] = useState(false);
   const [chosenDestination, setImportDestination] = useState('');
@@ -112,10 +114,10 @@ function Surface({ children }: { children: ReactNode }) {
   }
   async function selectSource(id: string, start = false) {
     const ticket = playbackTicket(), wasPlaying = isTunedIn();
-    await run({ kind: 'select', id });
+    const selected = await run({ kind: 'select', id }) as DesktopLibrary;
     if (!ticketCurrent(ticket)) return;
-    const source = library.data?.stations.find(s => s.id === id) || library.data?.playlists.find(p => p.id === id);
-    if (source?.count === 0) { stop(); setNotice('This collection is empty. Add songs from files or YouTube.'); }
+    const source = selected.stations.find(s => s.id === id) || selected.playlists.find(p => p.id === id);
+    if (!selected.tracks.length) { stop(); setNotice('This collection is empty. Add songs from files or YouTube.'); }
     else {
       // A live MP3 decoder may retain seconds of the previous collection.
       // Rejoin on an explicit source change, retaining the same audio node.
@@ -148,6 +150,34 @@ function Surface({ children }: { children: ReactNode }) {
     } else if (action === 'next' && !command.isPending && library.data?.tracks.length) void run({ kind: 'next' }).catch(() => {});
   });
   useEffect(() => window.desktopPlayer?.onCommand?.(action => handleDesktopCommand(action)), []);
+  const handleAgentCommand = useEffectEvent(async (action: DesktopAgentAction, args: Record<string, unknown>) => {
+    const snapshot = () => {
+      const audio = audioRef.current;
+      return { playing: !!audio && !audio.paused && audio.readyState >= 2, tunedIn: isTunedIn(),
+        volume: Math.round((audio?.volume ?? 0) * 100), muted: audio?.volume === 0,
+        currentTime: audio?.currentTime || 0, error: audio?.error?.message || null };
+    };
+    if (action === 'stop') stop();
+    else if (action === 'play-track') await playTrack(String(args.trackId));
+    else if (action === 'play-source') await selectSource(String(args.sourceId), true);
+    else if (action === 'play-download') await playDownload(String(args.jobId));
+    else if (action === 'next') await run({ kind: 'next' });
+    else if (action === 'set-volume') {
+      if (typeof args.volume !== 'number' || args.volume < 0 || args.volume > 100) throw new Error('Volume must be between 0 and 100.');
+      setVolume(args.volume / 100);
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    if (action.startsWith('play-')) {
+      const intent = transportIntent.current, deadline = Date.now() + 12_000;
+      while (!snapshot().playing && Date.now() < deadline && intent === transportIntent.current && isTunedIn()) {
+        if (audioRef.current?.error) throw new Error(audioRef.current.error.message || 'Audio could not play.');
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+      if (!snapshot().playing) throw new Error(isTunedIn() ? 'Playback did not start. Check the selected file and audio output, then retry.' : 'Playback is stopped. The earlier request did not start audio.');
+    }
+    return snapshot();
+  });
+  useEffect(() => window.desktopPlayer?.onAgentCommand?.((action, args) => handleAgentCommand(action, args)), []);
   const source = library.data?.stations.find(s => s.id === library.data?.selected)?.name
     || library.data?.playlists.find(p => p.id === library.data?.selected)?.name || 'Your local music';
   const visibleError = error || (library.error ? explain(library.error) : library.data?.error);
