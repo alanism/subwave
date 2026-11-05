@@ -1,6 +1,6 @@
 # Subwave owner’s manual
 
-**Linux desktop edition · version 1.2.1 · Original + Enochian**
+**Linux desktop edition · version 1.3.0 · Original + Enochian**
 
 Subwave plays music saved on your computer. It also searches YouTube, downloads MP3s and organizes them into separate genre radio stations. Your local station starts with the app. You do not need an admin login or a separately configured server.
 
@@ -42,7 +42,7 @@ Opening a panel keeps music playing. **Close · Esc** returns to the player. **P
 
 ## Find your way around
 
-The top toolbar is available in both skins.
+Original uses a top toolbar. Enochian puts the same actions on six small front-panel keys: **Open files, Library, Genres, YouTube, Next and Settings**. The native menus remain available in both skins. In Enochian, **Library** opens Library & Playlists and **Genres** opens Genre stations.
 
 | Area | What you do there |
 | --- | --- |
@@ -55,7 +55,7 @@ The top toolbar is available in both skins.
 
 **Player** opens the same areas and provides playback commands. **Skin** selects Original or Enochian. **View** controls zoom and fullscreen. **Help** opens your music folder, desktop log and version information.
 
-The selected playback collection appears in the status bar. Choosing an **import destination** controls where files are added; it does not switch what is playing.
+The selected playback collection appears in the status bar and, in Enochian, beside the **INPUT** knob and on the receiver display. Turn the left knob by dragging vertically; the source changes when you release it. With the knob focused, arrow keys select the next/previous station or playlist, Home selects the first and End selects the last. Empty collections stay selectable so you can add music to them. Choosing an **import destination** controls where files are added; it does not switch what is playing.
 
 ## Open and find local files
 
@@ -81,7 +81,7 @@ Use **Refresh library** after repairing or changing files in Subwave’s managed
 
 Choose **Play** beside a library track, **Play playlist** in a playlist editor, or **Play station** in Genre stations.
 
-Enochian’s receiver power control reads **TUNE IN** when stopped and **TUNE OUT** while listening. Tune in starts the selected collection; tune out stops listening. Original exposes its player transport. **Ctrl+Space** provides Play / Stop in either skin.
+Enochian’s **POWER** control starts or stops listening to the selected collection. Its indicator follows the listening state; the central screen reports **STOPPED**, **STARTING** or **PLAYING**. If the collection is empty, power opens Library so you can add music. Original exposes its player transport. **Ctrl+Space** provides Play / Stop in either skin.
 
 Choose **Next track** or press **Ctrl+Right** to advance. Next does not start music while stopped. If you stop during a pending track selection, playback stays stopped.
 
@@ -89,7 +89,7 @@ The desktop uses a continuous local radio stream. It does not expose a seek/scru
 
 ### Volume and mute
 
-In Enochian, drag the knob up/down or move the ribbed slider. They control the same volume value. The mute switch silences output. In Original, use its volume control. **Ctrl+M** toggles mute in either skin. Skin changes preserve the intended volume and mute state.
+In Enochian, drag the right **VOLUME** knob up/down. Open **Fine volume control** below the receiver to reveal the original ribbed slider. Both control the same gain. Focus the knob and use arrows for 2% steps; the slider offers 1% arrow steps and 10% Page Up/Down steps. Home/End select minimum/maximum. The mute switch silences output. In Original, use its volume control. **Ctrl+M** toggles mute in either skin. Skin changes preserve the intended volume and mute state.
 
 The display reports the current song and playback state. Empty stations explain how to add music. Brief connection and metadata delays can occur when joining or changing the local MP3 stream.
 

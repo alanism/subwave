@@ -1,0 +1,75 @@
+/* Enclosure and mounting only. The tactile parts keep the authored atlas CSS. */
+.room {
+  --case:#e9e9e5; --face:#f2f2ef; --print:#42423f; --quiet:#676760; --edge:#b6b6b0;
+  position:absolute; inset:0; overflow:auto; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:64px 36px 90px; background:#e2e1dc; color:var(--print); font-family:"IBM Plex Sans",sans-serif;
+}
+.receiver { width:100%; max-width:1160px; position:relative; flex-shrink:0; filter:drop-shadow(0 24px 18px #0002); }
+.cabinet { height:38px; margin:0 15px; background:linear-gradient(180deg,#555652,#292a28); border:1px solid #353633; border-radius:5px 5px 0 0; position:relative; transform:perspective(450px) rotateX(12deg); transform-origin:bottom; }
+.vents { position:absolute; left:10%; right:10%; bottom:7px; height:17px; background:repeating-linear-gradient(90deg,#141512 0 3px,#62635f 3px 4px,transparent 4px 10px); opacity:.85; }
+.faceplate { position:relative; z-index:1; height:310px; display:grid; grid-template-columns:22% minmax(0,1fr) 22%; grid-template-rows:minmax(0,1fr) 65px; align-items:center; padding:48px 32px 15px; background:linear-gradient(110deg,#ffffff65,transparent 30%,#d8d8d22b 70%,#ffffff75),var(--face); border:1px solid var(--edge); border-top-color:#fff; border-radius:3px; box-shadow:inset 0 0 0 2px #ffffff75,inset 0 -2px 2px #8d8d852b,0 2px 2px #0003; }
+.identity { position:absolute; top:18px; left:27px; display:flex; align-items:baseline; gap:10px; line-height:1; }
+.identity strong { font-size:15px; font-weight:700; letter-spacing:.5px; }
+.identity span { font:500 9px "IBM Plex Mono",monospace; letter-spacing:1.8px; }
+.identity small { position:absolute; top:23px; left:0; white-space:nowrap; color:var(--quiet); font:8px "IBM Plex Mono",monospace; letter-spacing:1.4px; }
+.input,.volume { display:flex; flex-direction:column; align-items:center; gap:6px; min-width:0; }
+.input { grid-column:1;grid-row:1; }.volume { grid-column:3;grid-row:1; }
+.dialMount { width:141px; height:141px; display:grid; place-items:center; }
+.dialMount :global(.dial) { zoom:.64; }
+.dialMount :global([aria-disabled="true"]) { pointer-events:none; opacity:.6; }
+.dialLabel { min-height:31px; text-align:center; display:flex; flex-direction:column; gap:5px; max-width:100%; }
+.dialLabel > span,.power > span,.mute > span { font:9px "IBM Plex Mono",monospace; letter-spacing:1.7px; }
+.dialLabel strong { font:500 11px "IBM Plex Sans",sans-serif; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; color:var(--quiet); }
+.screen { grid-column:2; grid-row:1; min-width:0; width:82%; justify-self:center; padding:0 0 15px; }
+.screen :global(.mk-display) { min-height:124px; margin:0; padding:15px 22px; border-radius:5px; border:2px solid #121311; background:#19191b; box-shadow:inset 0 2px 5px #0009,0 1px 0 #fff; display:flex; flex-direction:column; justify-content:center; gap:7px; white-space:normal; }
+.displayTop,.displayBottom { display:flex; justify-content:space-between; gap:18px; font:9px "IBM Plex Mono",monospace; letter-spacing:1px; color:#b7b8ae; line-height:1.3; }
+.displayTop > span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.displayTop > span:last-child { flex-shrink:0; color:#e1e2d9; }
+.trackTitle { display:block; font:500 clamp(16px,1.6vw,22px)/1.2 "IBM Plex Sans",sans-serif; color:#f2f2eb; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.artist { display:block; font:11px/1.4 "IBM Plex Sans",sans-serif; color:#c5c6bd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.displayBottom { margin-top:8px; font-size:8px; }
+.power,.mute { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; min-width:0; }
+.power { grid-column:1;grid-row:2; }.mute { grid-column:3;grid-row:2; }
+/* The atlas power head is mounted without its demo readout or separate case. */
+.power :global(.radio[data-theme]) { --r-power-on:#cc0000; --r-power-off:#111; width:auto; border-radius:0; background:transparent; box-shadow:none; }
+.power :global(.rhead) { border:0; }.power :global(.rdisp) { display:none; }
+.power :global(.pwr) { width:44px; height:38px; border:0; padding:0; }
+.functionKeys { grid-column:2; grid-row:2; min-width:0; width:82%; justify-self:center; }
+.functionKeys :global(.ilk[data-finish]) { background:transparent; border-radius:0; padding:0; box-shadow:none; display:block; }
+.functionKeys :global(.ilk-col) { flex-direction:row; justify-content:space-between; gap:8px; }
+.functionKeys :global(.ilk-row) { margin:0; flex-direction:column; gap:8px; min-width:0; }
+.functionKeys :global(.ilk-sock) { zoom:.78; }
+.functionKeys :global(.ilk-lbl) { min-width:0; color:var(--print); font:9px "IBM Plex Sans",sans-serif; white-space:nowrap; }
+.functionKeys :global(.ilk-cap:disabled) { opacity:.45; cursor:default; }
+.mute :global(.fx),.fineVolume :global(.fx) { padding:0; background:transparent; box-shadow:none; border-radius:0; }
+.mute :global(.tg) { zoom:.57; }
+.plinth { height:9px; margin:0 3px; border-radius:0 0 2px 2px; background:linear-gradient(#42433f,#22231f); box-shadow:0 2px 1px #0004; }
+.feet { display:flex; justify-content:space-between; padding:0 9%; height:12px; }
+.feet i { display:block; width:74px; height:11px; border-radius:0 0 5px 5px; background:linear-gradient(#181917,#343531); box-shadow:0 5px 7px #0003; }
+.fineVolume { margin-top:35px; text-align:center; font:10px "IBM Plex Mono",monospace; color:var(--quiet); }
+.fineVolume summary { cursor:pointer; padding:8px; letter-spacing:.3px; }
+.fineVolume summary:focus-visible { outline:2px solid #c00; outline-offset:3px; }
+.fineVolume > div { display:flex; align-items:center; gap:16px; padding:12px; }
+.fineVolume :global(.hs) { width:240px; }
+.room :global(.source) { display:contents; }
+.room[data-enochian-receiver="obsidian"] { --face:#242527; --case:#292a2c; --print:#ddddda; --quiet:#b6b6b0; --edge:#414244; background:#17181a; }
+.room[data-enochian-receiver="obsidian"] .faceplate { border-top-color:#646568; box-shadow:inset 0 0 0 2px #ffffff08,inset 0 -2px 2px #0008,0 2px 2px #0009; background:linear-gradient(110deg,#ffffff08,transparent 35%,#ffffff03),var(--face); }
+.room[data-enochian-receiver="obsidian"] .screen :global(.mk-display) { box-shadow:inset 0 2px 5px #0009,0 1px 0 #ffffff18; }
+@media(max-width:950px) {
+  .room { padding:48px 24px 80px; }.faceplate { height:280px; grid-template-columns:20% minmax(0,1fr) 20%; padding:48px 20px 14px; }
+  .dialMount { width:110px; height:110px; }.dialMount :global(.dial) { zoom:.5; }
+  .screen { width:94%; padding:0 0 5px; }.functionKeys { width:94%; }.screen :global(.mk-display) { padding:12px 14px; }.displayTop { font-size:8px; letter-spacing:.3px; gap:8px; }
+  .functionKeys :global(.ilk-col) { gap:5px; }.functionKeys :global(.ilk-lbl) { font-size:8px; }.functionKeys :global(.ilk-sock) { zoom:.72; }
+  .identity small { font-size:7px; }.identity strong { font-size:13px; }.identity span { font-size:8px; }
+}
+@media(max-width:700px) {
+  .room { padding:35px 14px 70px; }.faceplate { height:300px; padding:60px 14px 16px; grid-template-columns:100px minmax(0,1fr) 100px; grid-template-rows:140px 1fr; }
+  .dialMount { width:88px; height:88px; }.dialMount :global(.dial) { zoom:.4; }
+  .screen { width:100%; padding:0 8px 8px; }.screen :global(.mk-display) { min-height:115px; padding:11px; gap:6px; }.artist { font-size:10px; }
+  .identity { left:20px; }.cabinet { height:27px; }.trackTitle { font-size:16px; }.displayTop,.displayBottom { font-size:7px; letter-spacing:0; }.displayTop { flex-direction:column; gap:4px; }
+  .functionKeys { grid-column:1 / -1; grid-row:2; width:100%; padding:0 52px; align-self:end; }.functionKeys :global(.ilk-col) { gap:8px; }
+  .power,.mute { grid-row:2; align-self:start; }.power { justify-self:start; }.mute { justify-self:end; }
+  .power :global(.pwr) { width:38px; }.mute :global(.tg) { zoom:.5; }.power > span,.mute > span { font-size:8px; }
+  .dialLabel strong { max-width:100px; font-size:10px; }
+}
+@media(max-height:560px) { .room { justify-content:flex-start; padding-top:28px; }.fineVolume { margin-top:18px; } }

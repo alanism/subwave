@@ -77,3 +77,7 @@
   .stage :global([data-local-stage]) { bottom:96px; }
   .stage :global([data-local-waveform]) { display:none; }
 }
+
+/* Enochian mounts these actions on its receiver faceplate. Original keeps its toolbar. */
+.surface[data-skin="enochian"] > .toolbar { display:none; }
+.surface[data-skin="enochian"] > .statusBar { position:absolute; bottom:14px; left:24px; right:24px; z-index:2; border:0; background:transparent; font:10px "IBM Plex Mono",monospace; pointer-events:none; }

@@ -7,27 +7,30 @@ import { driveDial, polar, type ValueControl } from './vendor/interaction';
 
 /** Enochian Rotary Knob 01: original .dial/.dark-base/.dark-knob/.dash DOM.
  * Source: /UIUX/controls.js drawDarkTicks + driveDial; styling is vendored verbatim. */
-export default function VolumeDial({ value, finish, onChange }: {
+export default function VolumeDial({ value, finish, onChange, label = 'Volume knob', steps, valueText, onCommit, disabled }: {
   value: number; finish: 'ivory' | 'obsidian'; onChange: (value: number) => void;
+  label?: string; steps?: number; valueText?: (value: number) => string; onCommit?: (value: number) => void; disabled?: boolean;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const knob = useRef<HTMLDivElement>(null);
   const control = useRef<ValueControl | null>(null);
   const change = useRef(onChange);
   const initial = useRef(value);
+  const text = useRef(valueText);
+  const commit = useRef(onCommit);
   const calm = useSkinCalm();
-  useLayoutEffect(() => { change.current = onChange; initial.current = value; }, [onChange, value]);
+  useLayoutEffect(() => { change.current = onChange; initial.current = value; text.current = valueText; commit.current = onCommit; }, [onChange, value, valueText, onCommit]);
   useLayoutEffect(() => {
-    const c = driveDial(root.current!, knob.current!, initial.current, v => change.current(v), calm);
+    const c = driveDial(root.current!, knob.current!, initial.current, v => change.current(v), calm, { steps, valueText: v => text.current?.(v) ?? `${Math.round(v * 100)} percent`, onCommit: v => commit.current?.(v) });
     control.current = c;
     return () => { c.destroy(); control.current = null; };
-  }, [calm]);
+  }, [calm, steps]);
   useLayoutEffect(() => { control.current?.set(value); }, [value, calm]);
   return (
     <div className={a.foundation}>
       <div ref={root} className={a.dial} data-finish={finish} data-enochian-component="rotary-knob-01"
-        role="slider" tabIndex={0} aria-label="Volume knob" aria-valuemin={0} aria-valuemax={100}
-        aria-valuenow={Math.round(value * 100)} aria-valuetext={`${Math.round(value * 100)} percent`}>
+        role="slider" tabIndex={disabled ? -1 : 0} aria-disabled={disabled || undefined} aria-label={label} aria-valuemin={0} aria-valuemax={100}
+        aria-valuenow={Math.round(value * 100)} aria-valuetext={valueText?.(value) ?? `${Math.round(value * 100)} percent`}>
         <svg className={a.ticks} viewBox="0 0 220 220" aria-hidden="true">
           {Array.from({ length: 15 }, (_, i) => {
             const [x, y] = polar(110, 110, 96, -135 + i * (270 / 16));

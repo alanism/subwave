@@ -127,11 +127,11 @@ export function SourceAction({ finish, ...props }: KeyProps & { finish: Finish }
 }
 
 export function ReceiverNavigationBank<K extends string>({ items, finish, onSelect }: {
-  items: readonly { id: K; label: string; disabled?: boolean }[]; finish: Finish; onSelect: (id: K) => void;
+  items: readonly { id: K; label: string; ariaLabel?: string; disabled?: boolean }[]; finish: Finish; onSelect: (id: K) => void;
 }) {
   return <div className={a.instruments}><div className={a.selector} data-finish={finish} data-enochian-component="receiver-local-navigation">
     <div className={a.selectorColumn} role="group" aria-label="Local music panels">
-      {items.map((item, index) => <ReceiverKey key={item.id} label={item.label} index={index} disabled={item.disabled} mode="momentary" onClick={() => onSelect(item.id)} />)}
+      {items.map((item, index) => <ReceiverKey key={item.id} label={item.label} ariaLabel={item.ariaLabel} index={index} disabled={item.disabled} mode="momentary" onClick={() => onSelect(item.id)} />)}
     </div>
   </div></div>;
 }

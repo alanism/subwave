@@ -15,8 +15,9 @@ import { useDesktopSurface } from '@/components/desktop/DesktopContext';
 import type { SkinProps } from '../types';
 import { listenPhase, stationIdentity } from '../shared';
 import VolumeDial from './VolumeDial';
+import DesktopReceiver from './DesktopReceiver';
 import { SourceDisplay, SourceSlider, SourceMute, type Finish } from './SourceControls';
-import { ReceiverPower, ReceiverButtonBank, ReceiverNavigationBank } from './ReceiverControls';
+import { ReceiverPower, ReceiverButtonBank } from './ReceiverControls';
 import { useSourceFeedback } from './vendor/feedback';
 import './vendor/fonts.css';
 import './vendor/controls.css';
@@ -54,8 +55,11 @@ export default function EnochianSkin({ contained, portalNode }: SkinProps) {
     r: () => { if (desktop) desktop.openPanel('library'); else setPanel('request'); },
   }, { disabled: panel !== null || !!desktop?.panel });
 
+  if (desktop) return <DesktopReceiver desktop={desktop} finish={finish} title={nowPlaying?.title} artist={nowPlaying?.artist}
+    tunedIn={tunedIn} phaseLabel={phaseLabel} volume={volume} muted={muted} onPower={localPower} onVolume={setVolume} onMute={toggleMute} feedback={feedback} />;
+
   return (
-    <div className={styles.page} data-contained={contained || undefined} data-local={desktop ? true : undefined} onKeyDown={e => {
+    <div className={styles.page} data-contained={contained || undefined}  onKeyDown={e => {
       // Native buttons and the dial own their keys; a focused REQUEST key must
       // open requests on Space rather than toggling the broadcast underneath it.
       if (e.target instanceof HTMLElement && e.target.closest('button, a, [role="slider"]')) e.stopPropagation();
@@ -68,8 +72,8 @@ export default function EnochianSkin({ contained, portalNode }: SkinProps) {
         <section className={styles.nowPlaying} aria-label="Now playing">
           <div className={styles.sectionHead}><h2>Now playing</h2><span role="status">{phaseLabel}</span></div>
           <SourceDisplay>{[
-            desktop ? (nowPlaying?.title || (localEmpty ? 'Add music to get started' : 'Choose a track in Library')) : offline ? 'The station is off air' : (nowPlaying?.title || 'Waiting for the broadcast'),
-            desktop ? (nowPlaying?.artist || 'Open audio files or find a song on YouTube.') : offline ? 'Waiting for the station to return.' : (nowPlaying?.artist || 'Tune in to hear what is on.'),
+            offline ? 'The station is off air' : (nowPlaying?.title || 'Waiting for the broadcast'),
+            offline ? 'Waiting for the station to return.' : (nowPlaying?.artist || 'Tune in to hear what is on.'),
           ].join('\n')}</SourceDisplay>
         </section>
         <div className={styles.instruments}>
@@ -84,18 +88,15 @@ export default function EnochianSkin({ contained, portalNode }: SkinProps) {
             <div className={styles.sectionHead}><h2>Playback</h2><span>{muted ? 'MUTED' : 'SOUND ON'}</span></div>
             <div className={styles.transportStage}>
               <div className={styles.transportRow}>
-                <ReceiverPower on={tunedIn} status={phaseLabel} finish={finish} onToggle={localPower} feedback={feedback} disabled={desktop ? !tunedIn && (localEmpty || !desktop.library.data) : undefined} />
+                <ReceiverPower on={tunedIn} status={phaseLabel} finish={finish} onToggle={power} feedback={feedback} />
                 <div className={styles.controlColumn}><SourceMute on={muted} finish={finish} onChange={next => { if (next !== muted) { feedback(next ? 'thock' : 'tick'); toggleMute(); } }} /><span>MUTE</span></div>
               </div>
-              {desktop ? <ReceiverNavigationBank finish={finish} items={[
-                { id: 'youtube', label: 'YouTube' }, { id: 'stations', label: 'Genre stations' }, { id: 'library', label: 'Library & Playlists' },
-                { id: 'next', label: 'Next track', disabled: desktop.busy || !desktop.library.data?.tracks.length },
-              ] as const} onSelect={id => { if (id === 'next') void desktop.run({ kind: 'next' }).catch(() => {}); else desktop.openPanel(id); }} /> : <ReceiverButtonBank active={panel} finish={finish} onSelect={setPanel} feedback={feedback} />}
+              <ReceiverButtonBank active={panel} finish={finish} onSelect={setPanel} feedback={feedback} />
             </div>
           </section>
         </div>
       </main>
-      <footer className={styles.footer}><span>SUB/WAVE · ENOCHIAN</span><nav aria-label="Station">{desktop ? <><button type="button" onClick={() => desktop.openPanel('library')}>YOUR MUSIC</button><button type="button" onClick={() => desktop.openPanel('settings')}>SETTINGS</button></> : <><button type="button" onClick={() => setPanel('booth')}>BOOTH</button><a href={DESKTOP_EDITION ? '/admin/settings' : '/admin'}>{DESKTOP_EDITION ? 'SETTINGS' : 'ADMIN'}</a></>}</nav></footer>
+      <footer className={styles.footer}><span>SUB/WAVE · ENOCHIAN</span><nav aria-label="Station"><button type="button" onClick={() => setPanel('booth')}>BOOTH</button><a href={DESKTOP_EDITION ? '/admin/settings' : '/admin'}>{DESKTOP_EDITION ? 'SETTINGS' : 'ADMIN'}</a></nav></footer>
       <Sheet open={panel !== null} onOpenChange={open => { if (!open) setPanel(null); }} title={panel ? TITLES[panel] : ''} container={portalNode}>
         <Suspense fallback={<p className="text-sm text-muted">Loading…</p>}>
           {panel && <ReceiverPanel panel={panel} onClose={() => setPanel(null)} />}

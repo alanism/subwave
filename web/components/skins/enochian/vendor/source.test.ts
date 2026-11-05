@@ -57,3 +57,43 @@ test('the original spring settles, cancels on teardown and respects reduced moti
     globalThis.cancelAnimationFrame = originalCancel;
   }
 });
+
+test('input dial has discrete source stops and commits once per gesture; volume stays continuous', async () => {
+  const { driveDial } = await import('./interaction');
+  class Dial extends EventTarget {
+    attributes = new Map<string, string>();
+    style = { transform: '' };
+    setAttribute(name: string, value: string) { this.attributes.set(name, value); }
+    focus() { /* test host */ }
+    setPointerCapture() { /* test host */ }
+    send(type: string, props: Record<string, unknown>) { this.dispatchEvent(Object.assign(new Event(type, { cancelable: true }), props)); }
+  }
+  const input = new Dial(), knob = new Dial(), values: number[] = [], commits: number[] = [];
+  const control = driveDial(input as unknown as HTMLElement, knob as unknown as HTMLElement, 0, v => values.push(v), true,
+    { steps: 5, valueText: v => ['All', 'Jazz', 'House', 'Rock', 'Local'][Math.round(v * 4)]!, onCommit: v => commits.push(v) });
+  input.send('keydown', { key: 'ArrowRight' });
+  assert.equal(values.at(-1), .25);
+  assert.equal(input.attributes.get('aria-valuetext'), 'Jazz');
+  assert.deepEqual(commits, [.25]);
+  input.send('pointerdown', { button: 0, clientY: 150, pointerId: 1 });
+  input.send('pointermove', { clientY: 70 });
+  assert.equal(values.at(-1), .75);
+  assert.equal(commits.length, 1, 'preview must not issue source commands during a drag');
+  input.send('pointerup', {});
+  input.send('pointerup', {});
+  assert.deepEqual(commits, [.25, .75]);
+  input.send('pointerdown', { button: 0, clientY: 150, pointerId: 1 });
+  input.send('pointermove', { clientY: 0 });
+  input.send('pointercancel', {});
+  assert.equal(values.at(-1), .75);
+  assert.equal(commits.length, 2, 'cancel must not change the selected collection');
+  control.destroy();
+  input.send('keydown', { key: 'End' });
+  assert.equal(commits.length, 2, 'unmount removes input listeners');
+  const volume = new Dial();
+  let gain = .5;
+  const continuous = driveDial(volume as unknown as HTMLElement, knob as unknown as HTMLElement, gain, v => { gain = v; }, true);
+  volume.send('keydown', { key: 'ArrowUp' });
+  assert.equal(gain, .52, 'the authored volume increment is unchanged');
+  continuous.destroy();
+});

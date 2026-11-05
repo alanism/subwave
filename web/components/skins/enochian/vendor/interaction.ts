@@ -50,7 +50,7 @@ export class Spring {
 export interface ValueControl { set: (value: number) => void; destroy: () => void }
 
 /** Original driveDial: 150px full travel; 2% arrow increments; ±135°. */
-export function driveDial(el: HTMLElement, knob: HTMLElement, value: number, onChange: (v: number) => void, reduce: boolean): ValueControl {
+export function driveDial(el: HTMLElement, knob: HTMLElement, value: number, onChange: (v: number) => void, reduce: boolean, options?: { steps?: number; valueText?: (v: number) => string; onCommit?: (v: number) => void }): ValueControl {
   let v = value, sy = 0, sv = 0, dragging = false;
   let animation: ReturnType<typeof animate> | undefined;
   const events = new AbortController();
@@ -59,9 +59,13 @@ export function driveDial(el: HTMLElement, knob: HTMLElement, value: number, onC
     if (instant || reduce) knob.style.transform = `rotate(${ang(v)}deg)`;
     else animation = animate(knob, { rotate: ang(v) }, HEAVY);
     el.setAttribute('aria-valuenow', String(Math.round(v * 100)));
-    el.setAttribute('aria-valuetext', Math.round(v * 100) + ' percent');
+    el.setAttribute('aria-valuetext', options?.valueText?.(v) ?? Math.round(v * 100) + ' percent');
   }
-  function set(next: number, instant = false) { v = clamp(next); render(instant); onChange(v); }
+  function set(next: number, instant = false) {
+    const bounded = clamp(next);
+    v = options?.steps && options.steps > 1 ? Math.round(bounded * (options.steps - 1)) / (options.steps - 1) : bounded;
+    render(instant); onChange(v);
+  }
   el.addEventListener('pointerdown', e => {
     if (e.button !== 0) return;
     dragging = true; sy = e.clientY; sv = v; el.focus(); el.setPointerCapture(e.pointerId);
@@ -70,14 +74,16 @@ export function driveDial(el: HTMLElement, knob: HTMLElement, value: number, onC
     if (!dragging) return;
     set(sv + (sy - e.clientY) / 150, true);
   }, { signal: events.signal });
-  const up = () => { dragging = false; render(); };
+  const up = () => { if (!dragging) return; dragging = false; render(); options?.onCommit?.(v); };
   el.addEventListener('pointerup', up, { signal: events.signal });
-  el.addEventListener('pointercancel', up, { signal: events.signal });
+  el.addEventListener('pointercancel', () => { if (!options?.steps) { up(); return; } dragging = false; v = sv; render(true); onChange(v); }, { signal: events.signal });
   el.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { set(v + .02); e.preventDefault(); }
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { set(v - .02); e.preventDefault(); }
+    const increment = options?.steps && options.steps > 1 ? 1 / (options.steps - 1) : .02;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { set(v + increment); e.preventDefault(); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { set(v - increment); e.preventDefault(); }
     if (e.key === 'Home') { set(0); e.preventDefault(); }
     if (e.key === 'End') { set(1); e.preventDefault(); }
+    if (['ArrowRight', 'ArrowUp', 'ArrowLeft', 'ArrowDown', 'Home', 'End'].includes(e.key)) options?.onCommit?.(v);
   }, { signal: events.signal });
   render(true);
   return {

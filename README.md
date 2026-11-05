@@ -12,9 +12,13 @@ This desktop edition is developed from [perminder-klair/subwave](https://github.
 
 ### Enochian
 
-The authored [Enochian Elements](https://uiux-nonhumanintelligence.web.app/UIUX) controls run from their source code: rotary knob, ribbed slider, inset display, AV receiver power control, switches, Input Selector keys and rolling search control. Layout and scale adapt to the app while preserving the controls’ materials, geometry and interaction behavior. Ivory and Obsidian are finishes of the same skin.
+The authored [Enochian Elements](https://uiux-nonhumanintelligence.web.app/UIUX) controls run from their source code: rotary knob, ribbed slider, inset display, AV receiver power control, switches, Input Selector keys and rolling search control. Layout and scale adapt to the app while preserving the controls’ materials, geometry and interaction behavior. The Linux player mounts these parts on one wide receiver chassis: input knob on the left, compact central display, volume on the right and small function keys below. The left knob selects actual genre stations and playlists; the ribbed fine-volume slider opens below the receiver. Ivory and Obsidian are finishes of the same skin.
+
+Receiver-specific design criteria: [Ryo Lu inspired rubric](docs/design/enochian-receiver-ryo-rubric.md), [Andy Allen inspired rubric](docs/design/enochian-receiver-andy-rubric.md) and [evaluation](docs/design/enochian-receiver-evaluation.md). Each rubric has twenty criteria with five explicit levels, grounded in the supplied JBL receiver references. They are project interpretations, not personal designer endorsements.
 
 ![Enochian player with real local audio playing](docs/images/linux-enochian.png)
+
+[View the Obsidian finish](docs/images/linux-enochian-obsidian.png).
 
 ### Original
 
