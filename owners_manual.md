@@ -1,6 +1,6 @@
 # Subwave owner’s manual
 
-**Linux desktop edition · version 1.3.0 · Original + Enochian**
+**Linux desktop edition · version 1.3.1 · Original + Enochian**
 
 Subwave plays music saved on your computer. It also searches YouTube, downloads MP3s and organizes them into separate genre radio stations. Your local station starts with the app. You do not need an admin login or a separately configured server.
 
@@ -55,7 +55,7 @@ Original uses a top toolbar. Enochian puts the same actions on six small front-p
 
 **Player** opens the same areas and provides playback commands. **Skin** selects Original or Enochian. **View** controls zoom and fullscreen. **Help** opens your music folder, desktop log and version information.
 
-The selected playback collection appears in the status bar and, in Enochian, beside the **INPUT** knob and on the receiver display. Turn the left knob by dragging vertically; the source changes when you release it. With the knob focused, arrow keys select the next/previous station or playlist, Home selects the first and End selects the last. Empty collections stay selectable so you can add music to them. Choosing an **import destination** controls where files are added; it does not switch what is playing.
+The selected playback collection appears in the status bar and, in Enochian, beside the **TUNING** knob and on the receiver display. Turn the left knob by dragging vertically; the source changes when you release it. With the knob focused, arrow keys select the next/previous station or playlist, Home selects the first and End selects the last. Empty collections stay selectable so you can add music to them. Choosing an **import destination** controls where files are added; it does not switch what is playing.
 
 ## Open and find local files
 
@@ -92,6 +92,16 @@ The desktop uses a continuous local radio stream. It does not expose a seek/scru
 In Enochian, drag the right **VOLUME** knob up/down. Open **Fine volume control** below the receiver to reveal the original ribbed slider. Both control the same gain. Focus the knob and use arrows for 2% steps; the slider offers 1% arrow steps and 10% Page Up/Down steps. Home/End select minimum/maximum. The mute switch silences output. In Original, use its volume control. **Ctrl+M** toggles mute in either skin. Skin changes preserve the intended volume and mute state.
 
 The display reports the current song and playback state. Empty stations explain how to add music. Brief connection and metadata delays can occur when joining or changing the local MP3 stream.
+
+### Tune channels and read the receiver display
+
+Enochian's left **TUNING** knob and the sliding channel scale inside its screen select the same genre stations and playlists. The channel number describes its position in your current collection list.
+
+Drag the scale left/right; the printed scale moves behind the fixed red needle. Release to settle on a channel. A quick fling glides into a channel stop. Drag cancellation leaves the selected source unchanged. With the scale focused, arrows move one channel, Shift+arrows move five, Home/End reach the first/last, and Page Up/Down seek with wrapping at the ends. The tuner updates when you select a station or playlist elsewhere, including through an agent.
+
+Tuning while listening switches to that collection and keeps music playing when it contains tracks. Tuning while stopped keeps playback stopped. An empty channel shows **NO TRACKS** and power opens Library so you can add music.
+
+The center screen also contains the **same spectrum visualization as Original**, driven by the current audio. The trace rests when playback stops. Reduced motion and Lite mode hold a resting trace while playback continues. Changing skins retains the same audio element and analyser, so visualization does not restart the song.
 
 ## Create and manage playlists
 
@@ -177,7 +187,7 @@ Requesting the same video reuses its download record. Failed items offer **Retry
 
 ## Appearance and window controls
 
-Choose **Skin → Original** or **Skin → Enochian**, or use **Settings → Player skin**. Original offers Light/Dark palettes; Enochian offers Ivory/Obsidian finishes. Use **Settings → Color palette** to select a finish. The appearance control beside the skin name also offers appearance options and **Lite mode**.
+Choose **Skin → Original** or **Skin → Enochian**, or use **Settings → Player skin**. Original offers Light/Dark palettes; Enochian offers Ivory/Obsidian finishes. Use **Settings → Color palette** to select a finish. Original’s appearance control beside the skin name also offers **Lite mode**, which applies across skins.
 
 Changing skins preserves the shared player and music organization. Appearance and window size are saved. Lite mode reduces optional effects; controls also honor the system’s reduced-motion preference.
 
@@ -204,7 +214,7 @@ Shortcuts apply while Subwave is the active application.
 | Close local panel | Esc |
 | Quit | Ctrl+Q |
 
-Use **Tab / Shift+Tab** to move between controls, **Enter** to submit forms and **Space** to activate focused buttons/switches. In the genre selector, arrows move between exclusive choices and **Home / End** choose first/last. Focus the Enochian knob or slider to use arrows for volume; **Home / End** set minimum/maximum. The slider also supports **Page Up / Page Down** for larger steps.
+Use **Tab / Shift+Tab** to move between controls, **Enter** to submit forms and **Space** to activate focused buttons/switches. In the genre selector, arrows move between exclusive choices and **Home / End** choose first/last. Focus Enochian’s **VOLUME** knob or fine-volume slider to use arrows for volume; **Home / End** set minimum/maximum. The slider also supports **Page Up / Page Down** for larger steps.
 
 ## Let Aya or Hermes control Subwave
 

@@ -3,6 +3,9 @@
 // The JBL reference defines the enclosure and hierarchy, not replacement
 // controls. All tactile parts below are the user's actual atlas adapters.
 import { useLayoutEffect, useState } from 'react';
+import { usePlayerAudio, usePlayerFeed } from '@/components/player/PlayerCore';
+import Waveform from '../classic/Waveform';
+import SourceTuner from './SourceTuner';
 import type { DesktopSurfaceContext } from '@/components/desktop/DesktopContext';
 import VolumeDial from './VolumeDial';
 import { SourceDisplay, SourceMute, SourceSlider, type Finish } from './SourceControls';
@@ -17,6 +20,8 @@ type Props = {
 };
 
 export default function DesktopReceiver({ desktop, finish, title, artist, tunedIn, phaseLabel, volume, muted, onPower, onVolume, onMute, feedback }: Props) {
+  const { audioRef } = usePlayerAudio();
+  const { trackStartedAt, nowPlaying } = usePlayerFeed();
   const library = desktop.library.data;
   const sources = [...(library?.stations || []), ...(library?.playlists || [])];
   const selectedIndex = Math.max(0, sources.findIndex(source => source.id === library?.selected));
@@ -36,17 +41,20 @@ export default function DesktopReceiver({ desktop, finish, title, artist, tunedI
     <div className={styles.receiver} aria-label="Enochian audio receiver">
       <div className={styles.cabinet} aria-hidden="true"><div className={styles.vents} /></div>
       <div className={styles.faceplate}>
-        <header className={styles.identity}><strong>SUB/WAVE</strong><span>ENOCHIAN</span><small>LOCAL AUDIO RECEIVER</small></header>
+        <header className={styles.identity}><strong>SUB/WAVE</strong><span>ENOCHIAN</span><small>LOCAL RECEIVER</small></header>
         <section className={styles.input} aria-label="Input source">
           <div className={styles.dialMount}><VolumeDial label="Input source knob" value={input} steps={Math.max(2, sources.length)} valueText={value => sourceAt(value)?.name || 'Opening library'} onChange={setInput} onCommit={selectInput} disabled={desktop.busy || sources.length < 2} finish={finish} /></div>
-          <div className={styles.dialLabel}><span>INPUT</span><strong title={sourceAt(input)?.name}>{sourceAt(input)?.name || 'Opening library'}</strong></div>
+          <div className={styles.dialLabel}><span>TUNING</span><strong title={sourceAt(input)?.name}>{sourceAt(input)?.name || 'Opening library'}</strong></div>
         </section>
         <section className={styles.screen} aria-label="Now playing">
           <SourceDisplay>
             <span className={styles.displayTop}><span>{selected?.name || 'LOCAL MUSIC'}</span><span role="status">{phaseLabel}</span></span>
             <strong className={styles.trackTitle} title={title || undefined}>{title || (empty ? 'No tracks in this source' : 'Ready to play')}</strong>
             <span className={styles.artist} title={artist || undefined}>{artist || (empty ? 'Open files or find music on YouTube' : 'Press power to listen')}</span>
-            <span className={styles.displayBottom}><span>{library?.tracks.length ?? 0} TRACKS</span><span>{muted ? 'MUTED' : `VOL ${Math.round(volume * 100)}`}</span></span>
+            <Waveform audioRef={audioRef} tunedIn={tunedIn} trackStartedAt={trackStartedAt} duration={nowPlaying?.duration || 0} presentation="receiver" className={styles.spectrum} />
+            <SourceTuner channels={sources} value={Math.round(input * max)} disabled={desktop.busy || sources.length < 2}
+              onPreview={index => setInput(index / max)} onCommit={index => { feedback('thock'); selectInput(index / max); }} />
+            <span className={styles.displayBottom}><span>{library?.tracks.length ?? 0} {library?.tracks.length === 1 ? 'TRACK' : 'TRACKS'}</span><span>{muted ? 'MUTED' : `VOL ${Math.round(volume * 100)}`}</span></span>
           </SourceDisplay>
         </section>
         <section className={styles.volume} aria-label="Volume controls">

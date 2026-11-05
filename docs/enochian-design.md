@@ -22,6 +22,7 @@ The supplied hero cards inform two separate frozen [receiver rubrics](design/eno
 | Atlas component | Station use | Preserved source |
 | --- | --- | --- |
 | Rotary Knob 01 (`#darkDial`) | Left input and right volume in the Linux receiver; hosted volume | 220px dial, original dot/end ticks, base, cap and dash; ±135° rotation, 150px drag travel, 2% arrow increments |
+| Radio Tuner (`#ap`) | Tune actual local genre/playlist channels inside the receiver display | Original tick lengths/type, sliding strip, glass/fades, fixed needle, SNAP spring and 3.2/s glide friction; actual collection stops replace demo frequencies |
 | Slider 01 (`#trk`) | Same volume | 280px track, 66×34px thumb and five ribs; original spring, grab offset, 1% arrows and 10% Page keys |
 | Keyboard display (`#keyboardDisplay`) | Live title and artist | Original inset surface; compact aperture and text hierarchy adapt for the receiver |
 | Radio Player power head (`#radio .rhead`) | Tune in/out and connection status | Original 30px white power ring and 5px state dot; local mount removes demo readout and adapts hit area |
@@ -87,3 +88,15 @@ geometry and the adapted spring's settling/cleanup. Browser checks compare
 computed gradients, shadows, dimensions, borders, padding and typography against
 the live source, then exercise the linked volume controls, mute, power and
 drawers at desktop and mobile widths.
+
+## Channel tuning and Original visualization (1.3.1)
+
+The authored **Enochian Radio Tuner / Aperture Scale** is now mounted inside the receiver display using its original `ap` / `ap-window` / `ap-strip` / glass, fades and fixed-needle parts. The printed tick lengths, numeral typography, station dots, SNAP spring and 3.2-per-second glide friction come from the source snapshot. The compact viewport crops unused space above the printed scale; it does not replace the scale with a generic range control. Actual collection indices and names replace the atlas demo frequencies. These channels select real genre stations and playlists through the existing playback owner.
+
+`SourceTuner.tsx`, its mounting CSS and `vendor/tuner-interaction.ts` adapt source geometry to live collections. Pointer drag previews; release/glide settling commits once. Cancellation and unmount commit nothing. Arrows/Home/End and wrapping Page Up/Down support keyboard tuning. Pending operations disable tuning, and selecting a collection elsewhere updates the scale without issuing duplicate backend commands. The left knob remains another input to the same selection.
+
+`classic/Waveform.tsx` now accepts a compact receiver presentation while keeping its Original presentation and painter unchanged. The receiver uses the same 120 logarithmic frequency bars, real `useAnalyser` data, progress colors and motion gates. It reads the shell's existing audio ref; `ELEMENT_GRAPHS` reuses the graph across skin changes. Desktop builds retain the existing prohibition on synthetic fallback bars. Receiver canvas colors are inherited from screen-mounted CSS variables rather than following the light faceplate's black text.
+
+Native verification distinguishes resting, playing and reduced-motion traces by actual painted signal extent. Keyboard and pointer tuning are checked against the real selected-source API; the existing native import, playback, panel, two-skin and zoom regressions remain required. The 1.3.0 visual rubric assessment is historical; this extension has separate interaction and layout evidence in the workspace QA folder.
+
+Final 1.3.1 verification: 646 interface tests, lint/type checks and native packaging pass. Both skins/five main areas pass 40 window/zoom cases; both receiver finishes pass eight further cases, including the tuner’s visible bounds. Actual 48-pixel-high spectrum captures contain six painted rows at rest and 38–42 while playing a real fixture; reduced motion and Stop restore six rows. Stop during a moving tuner glide remains stopped after the selection settles. Native agent regression discovers 21 tools and proves agent-started playback drives the real spectrum without a UI gesture. Live YouTube search/download/genre-add/playback and cold reconnection also pass. OS file-dialog return values in native import/export checks are test-controlled; playback, analyser, files, worker and IPC are real.

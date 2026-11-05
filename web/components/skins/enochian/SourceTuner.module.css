@@ -1,0 +1,11 @@
+/* Original Aperture Scale parts/materials. The screen mount crops unused space
+   above the printed scale; tick lengths, type and the fixed needle stay intact. */
+.mount { min-width:0; width:100%; }
+.mount :global(.source) { display:contents; }
+.mount :global(.ap) { width:100%; gap:0; }
+.mount :global(.ap-window) { height:60px; border-radius:3px; box-shadow:inset 0 3px 10px #0008; }
+.mount :global(.ap-strip) { top:-52px; }
+.mount :global(.ap-strip svg) { height:128px; max-width:none; }
+.mount :global(.ap-band) { top:6px; left:7px; font-size:8px; }
+.mount :global(.ap-window:focus-visible) { outline-offset:2px; }
+.mount :global([aria-disabled="true"]) { opacity:.5; cursor:default; }

@@ -1,5 +1,6 @@
 // Original class names from controls.css. Keep the authored selectors intact.
 export const atlas = {
+  tuner: 'ap', tunerWindow: 'ap-window', tunerStrip: 'ap-strip', tunerFade: 'ap-fade', tunerGlass: 'ap-glass', tunerBand: 'ap-band', tunerNeedle: 'ap-needle', tunerTick: 'ap-t', tunerNumber: 'ap-n', tunerStation: 'ap-st',
   foundation: 'source source-foundation', compact: 'source source-compact', instruments: 'source source-instruments',
   dial: 'dial', ticks: 'ticks', darkBase: 'dark-base', darkKnob: 'dark-knob', dash: 'dash',
   display: 'mk-display', fx: 'fx', toggle: 'tg std', toggleKnob: 'tg-k',

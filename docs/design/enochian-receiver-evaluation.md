@@ -112,3 +112,7 @@ The receiver flow under test is `/listen` → select an actual source with the i
 Main source commands: `npm --prefix web run lint`, `npm --prefix web test`, `npm --prefix desktop run lint`, `npm --prefix desktop test`, `npm --prefix desktop run pack`. Private native regression scripts and logs remain in the workspace QA folder rather than being shipped as production features. No telemetry or new analytics was added.
 
 The README includes a clean installed-app screenshot. Additional window/finish evidence is linked from the local build board. Source rubrics remain at version 1.0 with unchanged anchors.
+
+## Follow-on: tuning and visualization, 1.3.1 (2026-11-06)
+
+The numerical design assessment above records 1.3.0. Version 1.3.1 adds the authored Radio Tuner and reuses Original's actual spectrum painter inside the receiver screen. New channel-selection, release/glide, Stop, motion-preference, skin-switch and native-agent checks have separate evidence. The README screenshots now show 1.3.1. The frozen rubric anchors and historical scores are unchanged; no new visual score is inferred from the extra passing tests.

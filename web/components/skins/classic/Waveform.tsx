@@ -76,6 +76,9 @@ function buildBinRanges(binCount: number, sampleRate: number): Array<[number, nu
 
 export interface WaveformProps {
   audioRef: RefObject<HTMLAudioElement | null>;
+  /** Receiver screen reuses this exact analyser/painter in a compact mount. */
+  presentation?: 'classic' | 'receiver';
+  className?: string;
   tunedIn: boolean;
   /** Epoch ms when the current track started (from useStationFeed). */
   trackStartedAt: number | null;
@@ -85,7 +88,7 @@ export interface WaveformProps {
 
 // One canvas paint per frame rather than 120 styled spans: ~0.25 ms/frame
 // against ~2.8 ms, which is what lets the strip run on Pi-class devices.
-export default memo(function Waveform({ audioRef, tunedIn, trackStartedAt, duration }: WaveformProps) {
+export default memo(function Waveform({ audioRef, tunedIn, trackStartedAt, duration, presentation = 'classic', className }: WaveformProps) {
   const { ready, read, sampleRate } = useAnalyser(audioRef, tunedIn);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const levelsRef = useRef<Float32Array>(new Float32Array(BARS));
@@ -272,11 +275,12 @@ export default memo(function Waveform({ audioRef, tunedIn, trackStartedAt, durat
 
   return (
     <div
-      data-local-waveform={DESKTOP_EDITION ? true : undefined}
+      data-local-waveform={DESKTOP_EDITION && presentation === 'classic' ? true : undefined}
+      data-receiver-waveform={presentation === 'receiver' ? true : undefined}
       // The band's vertical shape is gated on viewport HEIGHT as well as width
       // (#576). The two wide variants use mutually exclusive height queries so
       // neither depends on class order to win.
-      className="pointer-events-none absolute inset-x-3 bottom-24 h-[110px] px-1 opacity-[0.34] sm:right-24 sm:left-0 sm:px-8 dark:opacity-[0.45] [@media(min-width:640px)_and_(max-height:759px)]:bottom-32 [@media(min-width:640px)_and_(max-height:759px)]:h-20 [@media(min-width:640px)_and_(min-height:760px)]:bottom-[128px] [@media(min-width:640px)_and_(min-height:760px)]:h-40"
+      className={presentation === 'receiver' ? className : "pointer-events-none absolute inset-x-3 bottom-24 h-[110px] px-1 opacity-[0.34] sm:right-24 sm:left-0 sm:px-8 dark:opacity-[0.45] [@media(min-width:640px)_and_(max-height:759px)]:bottom-32 [@media(min-width:640px)_and_(max-height:759px)]:h-20 [@media(min-width:640px)_and_(min-height:760px)]:bottom-[128px] [@media(min-width:640px)_and_(min-height:760px)]:h-40"}
       aria-hidden="true"
     >
       <canvas ref={canvasRef} className="h-full w-full" />

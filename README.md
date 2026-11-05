@@ -12,7 +12,7 @@ This desktop edition is developed from [perminder-klair/subwave](https://github.
 
 ### Enochian
 
-The authored [Enochian Elements](https://uiux-nonhumanintelligence.web.app/UIUX) controls run from their source code: rotary knob, ribbed slider, inset display, AV receiver power control, switches, Input Selector keys and rolling search control. Layout and scale adapt to the app while preserving the controls’ materials, geometry and interaction behavior. The Linux player mounts these parts on one wide receiver chassis: input knob on the left, compact central display, volume on the right and small function keys below. The left knob selects actual genre stations and playlists; the ribbed fine-volume slider opens below the receiver. Ivory and Obsidian are finishes of the same skin.
+The authored [Enochian Elements](https://uiux-nonhumanintelligence.web.app/UIUX) controls run from their source code: rotary knob, ribbed slider, inset display, AV receiver power control, switches, Input Selector keys and rolling search control. Layout and scale adapt to the app while preserving the controls’ materials, geometry and interaction behavior. The Linux player mounts these parts on one wide receiver chassis: input knob on the left, compact central display, volume on the right and small function keys below. The left knob and authored sliding Radio Tuner select actual genre stations and playlists. The center screen also carries the Original skin’s audio-reactive spectrum; the ribbed fine-volume slider opens below the receiver. Ivory and Obsidian are finishes of the same skin.
 
 Receiver-specific design criteria: [Ryo Lu inspired rubric](docs/design/enochian-receiver-ryo-rubric.md), [Andy Allen inspired rubric](docs/design/enochian-receiver-andy-rubric.md) and [evaluation](docs/design/enochian-receiver-evaluation.md). Each rubric has twenty criteria with five explicit levels, grounded in the supplied JBL receiver references. They are project interpretations, not personal designer endorsements.
 
@@ -36,6 +36,8 @@ These are installed-app captures using an isolated test library. Changing skins 
 | Supported imports | MP3, FLAC, WAV, M4A and OGG are verified. The chooser also accepts Opus and AAC. Up to 50 files per import, each no larger than 250 MiB. |
 | Library | Search title, artist or genre; filter collections; refresh after file changes. |
 | Playlists | Create, rename, add/remove tracks, reorder, play in saved order, delete and restore. Playlists repeat after the last track. |
+| Receiver tuning | Authored sliding channel scale and left knob, with real genre/playlist selection, release-to-tune and keyboard seeking. |
+| Visualization | Original’s logarithmic spectrum in the receiver screen, driven by real audio; reduced motion and continuous playback across skins. |
 | Genre radio | Independent genre collections. Choose what plays or copy a track to another genre while keeping its original. |
 | YouTube | Search by song/artist or paste an individual video URL. Download real MP3s with visible job states and retry. |
 | Genre sorting | Match video tags, title and description to genre rules. Unclear matches wait for a manual destination. |
