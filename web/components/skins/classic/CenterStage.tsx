@@ -16,6 +16,7 @@ import { useStationClient } from '@/lib/stationClient';
 import type { TrackLyrics } from '@/components/skins/lyrics';
 import LyricsSettings, { usePopoverDismiss } from '@/components/skins/LyricsSettings';
 import type { NowPlayingTrack, QueueEntry, SessionTurn } from '@/lib/types';
+import { selectedInternetStation } from '@/lib/local-sources';
 import { useDesktopSurface } from '@/components/desktop/DesktopContext';
 
 /** Seconds before the end of the track that the "up next" tease fades in. The
@@ -138,6 +139,7 @@ export interface CenterStageProps {
 
 export default memo(function CenterStage({ nowPlaying, trackStartedAt, llmTokens, feed, djLineOn, boothBuddyOn, offline, upNext, lyricsShown = false, lyrics = null, onOpenBooth, onOpenTimeline }: CenterStageProps) {
   const desktop = useDesktopSurface();
+  const internet = selectedInternetStation(desktop?.library.data);
   const client = useStationClient();
   // The 1s elapsed tick lives here, in the component that displays it, so it
   // only re-renders this subtree — not the whole player (see useElapsed).
@@ -310,13 +312,13 @@ export default memo(function CenterStage({ nowPlaying, trackStartedAt, llmTokens
         <div className={cn('relative min-w-0', lyricsShown && '[@media(max-width:639px)_and_(min-height:700px)]:static')}>
           <div className={cn('v3-caption mb-[14px] text-muted', lyricsShown && '[@media(max-width:639px)_and_(min-height:700px)]:mb-1 [@media(max-width:639px)_and_(min-height:700px)]:truncate')}>
             {offline ? (
-              desktop ? 'No songs in this source' : 'Off air'
+              desktop ? (internet ? 'Station unavailable' : 'No songs in this source') : 'Off air'
             ) : (
               <>
                 {/* The phone view's row is plainly the track on air, and the
                     label would push the clock off a narrow phone. */}
                 <span className={cn(lyricsShown && '[@media(max-width:639px)_and_(min-height:700px)]:hidden')}>
-                  {desktop && !live ? 'Your local music' : 'Now playing'}{live ? ' — ' : ''}
+                  {desktop && !live ? (internet ? 'Internet radio' : 'Your local music') : 'Now playing'}{live ? ' — ' : ''}
                 </span>
                 {live && duration > 0 ? (
                   <button
@@ -405,7 +407,7 @@ export default memo(function CenterStage({ nowPlaying, trackStartedAt, llmTokens
                 </>
               ) : (
                 <h1 className="v3-title m-0 text-muted">
-                  {desktop ? (desktop.library.data?.tracks.length ? 'ready to play' : 'add your first song') : offline ? 'off air' : 'scanning the dial'}
+                  {desktop ? (internet ? 'live radio · press play' : desktop.library.data?.tracks.length ? 'ready to play' : 'add your first song') : offline ? 'off air' : 'scanning the dial'}
                   <span className="v3-blink ml-[0.1em]">_</span>
                 </h1>
               )}

@@ -10,6 +10,8 @@ import { useSkinSelection } from '@/components/skins/SkinContext';
 import { Button } from '@/components/ui/button';
 import type { DesktopAgentAction, DesktopCommand, DesktopPanel } from '@/lib/desktop';
 import type { DesktopLibrary } from '@/lib/schemas.generated';
+import { hasPlayableSource, selectedInternetStation } from '@/lib/local-sources';
+import InternetRadioPanel from './InternetRadioPanel';
 import { DesktopContext } from './DesktopContext';
 import { desktopKeys, useDesktopLibrary, useLocalCommand, type LocalCommand } from './queries';
 import { LibraryPanel, SettingsPanel, StationsPanel } from './DesktopPanels';
@@ -17,9 +19,10 @@ import styles from './DesktopSurface.module.css';
 
 export { useDesktopSurface } from './DesktopContext';
 const YoutubePanel = dynamic(() => import('@/components/admin/youtube/YoutubePanel'), { loading: () => <p role="status">Opening YouTube…</p> });
-const titles: Record<DesktopPanel, string> = { youtube: 'YouTube & Recent downloads', library: 'Library & Playlists', stations: 'Genre stations', settings: 'Local settings' };
+const titles: Record<DesktopPanel, string> = { youtube: 'YouTube & Recent downloads', library: 'Library & Playlists', stations: 'Genre stations', settings: 'Local settings', radio: 'Internet radio' };
 const explain = (error: unknown) => error instanceof Error ? error.message : String(error);
 const operationLabels: Record<LocalCommand['kind'], string> = {
+  'save-radio': 'Saving radio preset…', 'remove-radio': 'Removing radio preset…',
   select: 'Changing playback source…', play: 'Selecting track…', 'play-download': 'Preparing MP3 playback…',
   copy: 'Copying to genre…', next: 'Selecting next track…', rescan: 'Refreshing library…',
   'create-station': 'Creating genre station…', 'create-playlist': 'Creating playlist…',
@@ -70,8 +73,10 @@ function Surface({ children }: { children: ReactNode }) {
   async function run(value: LocalCommand, success?: string) {
     const nextTicket = value.kind === 'next' ? playbackTicket() : null;
     const wasPlaying = isTunedIn();
+    if (value.kind === 'remove-radio' && library.data?.selected === value.id) stop();
     const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const playlistEditor = trigger?.closest<HTMLElement>('[data-playlist-editor]');
+    const actionRow = trigger?.closest('li');
     setError(''); setNotice('');
     try {
       const result = await command.mutateAsync(value);
@@ -89,7 +94,8 @@ function Surface({ children }: { children: ReactNode }) {
           // on the dialog container.
           const formTarget = trigger?.isConnected ? trigger.closest('form')?.querySelector<HTMLElement>('input:not(:disabled),select:not(:disabled),button:not(:disabled)') : null;
           const playlistTarget = playlistEditor?.isConnected ? playlistEditor.querySelector<HTMLElement>('input[type="radio"]:checked') || playlistEditor.querySelector<HTMLElement>('select') : null;
-          const target = trigger?.isConnected && !trigger.matches(':disabled') ? trigger : formTarget || playlistTarget;
+          const rowTarget = actionRow?.isConnected ? actionRow.querySelector<HTMLElement>('button:not(:disabled)') : null;
+          const target = trigger?.isConnected && !trigger.matches(':disabled') ? trigger : formTarget || playlistTarget || rowTarget;
           target?.focus();
         }
       }));
@@ -116,8 +122,8 @@ function Surface({ children }: { children: ReactNode }) {
     const ticket = playbackTicket(), wasPlaying = isTunedIn();
     const selected = await run({ kind: 'select', id }) as DesktopLibrary;
     if (!ticketCurrent(ticket)) return;
-    const source = selected.stations.find(s => s.id === id) || selected.playlists.find(p => p.id === id);
-    if (!selected.tracks.length) { stop(); setNotice('This collection is empty. Add songs from files or YouTube.'); }
+    const source = selected.stations.find(s => s.id === id) || selected.playlists.find(p => p.id === id) || selected.internetStations?.find(p => p.id === id);
+    if (!hasPlayableSource(selected)) { stop(); setNotice('This collection is empty. Add songs from files or YouTube.'); }
     else {
       // A live MP3 decoder may retain seconds of the previous collection.
       // Rejoin on an explicit source change, retaining the same audio node.
@@ -145,7 +151,7 @@ function Surface({ children }: { children: ReactNode }) {
     else if (action === 'toggle-mute') toggleMute();
     else if (action === 'toggle-playback') {
       if (isTunedIn()) stop();
-      else if (library.data?.tracks.length) play();
+      else if (hasPlayableSource(library.data)) play();
       else openPanel('library');
     } else if (action === 'next' && !command.isPending && library.data?.tracks.length) void run({ kind: 'next' }).catch(() => {});
   });
@@ -179,7 +185,7 @@ function Surface({ children }: { children: ReactNode }) {
   });
   useEffect(() => window.desktopPlayer?.onAgentCommand?.((action, args) => handleAgentCommand(action, args)), []);
   const source = library.data?.stations.find(s => s.id === library.data?.selected)?.name
-    || library.data?.playlists.find(p => p.id === library.data?.selected)?.name || 'Your local music';
+    || library.data?.playlists.find(p => p.id === library.data?.selected)?.name || selectedInternetStation(library.data)?.name || 'Your local music';
   const visibleError = error || (library.error ? explain(library.error) : library.data?.error);
   const context = { panel, openPanel, library, busy: command.isPending, pendingKind: command.isPending ? command.variables?.kind ?? null : null, importing, importDestination, setImportDestination, newPlaylistRequest, openFiles, run, selectSource, playTrack, playDownload };
   const operationStatus = command.isPending && command.variables ? operationLabels[command.variables.kind] : notice;
@@ -188,14 +194,14 @@ function Surface({ children }: { children: ReactNode }) {
       <nav className={styles.toolbar} aria-label="Local music">
         <button ref={playerButton} className={styles.brand} type="button" onClick={() => openPanel(null)}>SUB/WAVE <span>LOCAL</span></button>
         <div className={styles.navButtons}>
-          {(['youtube', 'stations', 'library'] as const).map(id => <Button key={id} type="button" variant="outline" aria-haspopup="dialog" aria-expanded={panel === id} onClick={() => openPanel(id)}>{id === 'youtube' ? 'YouTube' : id === 'stations' ? 'Genre stations' : 'Library & Playlists'}</Button>)}
+          {(['youtube', 'radio', 'stations', 'library'] as const).map(id => <Button key={id} type="button" variant="outline" aria-haspopup="dialog" aria-expanded={panel === id} onClick={() => openPanel(id)}>{id === 'youtube' ? 'YouTube' : id === 'radio' ? 'Internet radio' : id === 'stations' ? 'Genre stations' : 'Library & Playlists'}</Button>)}
           <Button type="button" variant="outline" disabled={importing} onClick={() => void openFiles()}>{importing ? 'Importing…' : 'Open files'}</Button>
           {skin?.effectiveId === 'classic' && <Button type="button" variant="outline" disabled={command.isPending || !library.data?.tracks.length} onClick={() => void run({ kind: 'next' }).catch(() => {})}>Next track</Button>}
           <Button type="button" variant="outline" aria-haspopup="dialog" aria-expanded={panel === 'settings'} onClick={() => openPanel('settings')}>Settings</Button>
         </div>
       </nav>
       <div className={styles.statusBar}><span>{source}</span><span role={panel ? undefined : 'status'}>{operationStatus || (library.isPending ? 'Opening your library…' : `${library.data?.allTracks.length ?? 0} local tracks`)}</span></div>
-      {visibleError && !panel && <div className={styles.alert} role="alert">{visibleError} <button type="button" disabled={command.isPending} onClick={() => void run({ kind: 'rescan' }, 'Library refreshed.').catch(() => {})}>Retry / refresh</button></div>}
+      {visibleError && !panel && <div className={styles.alert} role="alert">{visibleError} <button type="button" disabled={command.isPending} onClick={() => { if (selectedInternetStation(library.data)) void selectSource(library.data!.selected, true).catch(() => {}); else void run({ kind: 'rescan' }, 'Library refreshed.').catch(() => {}); }}>Retry / refresh</button></div>}
       <div className={styles.stage}>{children}</div>
       <Dialog.Root open={panel !== null} onOpenChange={open => { if (!open) openPanel(null); }}>
         <Dialog.Portal>
@@ -204,11 +210,12 @@ function Surface({ children }: { children: ReactNode }) {
             onCloseAutoFocus={event => { event.preventDefault(); (focusReturn.current?.isConnected ? focusReturn.current : playerButton.current)?.focus(); }}>
             <div className={styles.dialogHeader}><Dialog.Title>{panel ? titles[panel] : ''}</Dialog.Title><Dialog.Close asChild><Button type="button" variant="outline" aria-label="Close local panel">Close · Esc</Button></Dialog.Close></div>
             <div className={styles.panelBody} data-skin={skin?.effectiveId}>
-              {visibleError && <div className={styles.alert} role="alert">{visibleError} <button type="button" disabled={command.isPending} onClick={() => void run({ kind: 'rescan' }, 'Library refreshed.').catch(() => {})}>Retry / refresh</button></div>}
+              {visibleError && <div className={styles.alert} role="alert">{visibleError} <button type="button" disabled={command.isPending} onClick={() => { if (selectedInternetStation(library.data)) void selectSource(library.data!.selected, true).catch(() => {}); else void run({ kind: 'rescan' }, 'Library refreshed.').catch(() => {}); }}>Retry / refresh</button></div>}
               <p className={styles.operationStatus} role="status">{operationStatus}</p>
               {panel === 'youtube' && <YoutubePanel />}
               {panel === 'library' && <LibraryPanel />}
               {panel === 'stations' && <StationsPanel />}
+              {panel === 'radio' && <InternetRadioPanel />}
               {panel === 'settings' && <SettingsPanel />}
             </div>
           </Dialog.Content>

@@ -1,6 +1,6 @@
 // A narrow optional bridge supplied by the installed desktop shell. The web
 // edition has no bridge and keeps its existing behaviour.
-export type DesktopPanel = 'youtube' | 'library' | 'stations' | 'settings';
+export type DesktopPanel = 'youtube' | 'library' | 'stations' | 'settings' | 'radio';
 export type DesktopCommand = 'open-files' | 'new-playlist' | 'toggle-playback' | 'next' | 'toggle-mute';
 export type DesktopAgentAction = 'status' | 'play-track' | 'play-source' | 'play-download' | 'stop' | 'next' | 'set-volume';
 export interface DesktopImportProgress { completed: number; total: number; name: string }

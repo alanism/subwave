@@ -10,6 +10,7 @@ import { Sheet } from '@/components/ui/sheet';
 import { usePlayerActions, usePlayerAudio, usePlayerFeed } from '@/components/player/PlayerCore';
 import { useTuneInGate } from '@/components/player/useTuneInGate';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { hasPlayableSource } from '@/lib/local-sources';
 import { DESKTOP_EDITION } from '@/lib/desktop';
 import { useDesktopSurface } from '@/components/desktop/DesktopContext';
 import type { SkinProps } from '../types';
@@ -39,13 +40,13 @@ export default function EnochianSkin({ contained, portalNode }: SkinProps) {
   const [panel, setPanel] = useState<Panel | null>(null);
   const { stationName } = stationIdentity(dj, activeShow, context);
   const phase = listenPhase({ tunedIn, status, offline });
-  const localEmpty = desktop?.library.data?.tracks.length === 0;
+  const localEmpty = !!desktop?.library.data && !hasPlayableSource(desktop.library.data);
   const phaseLabel = desktop
     ? (localEmpty ? 'NO TRACKS' : status === 'playing' ? 'PLAYING' : tunedIn ? 'STARTING' : 'STOPPED')
     : { offline: 'OFF AIR', standby: 'STANDBY', connecting: 'TUNING', live: 'ON AIR' }[phase];
   const feedback = useSourceFeedback(!muted);
   const power = showOverlay ? tuneInFromOverlay : handleTune;
-  const localPower = () => { if (desktop && !tunedIn && !desktop.library.data?.tracks.length) desktop.openPanel('library'); else power(); };
+  const localPower = () => { if (desktop && !tunedIn && !hasPlayableSource(desktop.library.data)) desktop.openPanel('library'); else power(); };
   const finish: Finish = themes?.effectiveId === 'enochian-obsidian' ? 'obsidian' : 'ivory';
 
   useKeyboardShortcuts({

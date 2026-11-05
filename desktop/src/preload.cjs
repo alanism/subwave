@@ -1,6 +1,6 @@
 'use strict';
 const { contextBridge, ipcRenderer } = require('electron');
-const panels = ['youtube', 'library', 'stations', 'settings'];
+const panels = ['youtube', 'library', 'stations', 'settings', 'radio'];
 
 // Narrow capabilities only: no arbitrary IPC, paths, commands or filesystem.
 contextBridge.exposeInMainWorld('desktopPlayer', {

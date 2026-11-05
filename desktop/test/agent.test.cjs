@@ -63,7 +63,7 @@ test('HTTP tools reject cross-site, unauthenticated, invalid and unknown calls b
   assert.match(await page.text(), /Search YouTube/);
   assert.match(page.headers.get('content-security-policy'), /frame-ancestors 'none'/);
   const catalog = await (await fetch(f.gateway.origin + '/api/agent/tools', { headers: { Authorization: `Bearer ${f.agent.token}` } })).json();
-  assert.equal(catalog.tools.length, 21);
+  assert.equal(catalog.tools.length, 25);
   assert.ok(!catalog.tools.find(t => t.name === 'subwave_search_library').inputSchema.required?.includes('limit'));
   for (const [name, args] of [['subwave_shell', {}], ['subwave_play_track', { trackId: '../secret' }],
     ['subwave_set_volume', { volume: 101 }], ['subwave_stop', { command: 'whoami' }], ['subwave_import_files', { paths: ['relative.mp3'] }]]) {
@@ -111,7 +111,7 @@ test('official MCP SDK client initializes, discovers and invokes the bundled std
     env: { ...process.env, SUBWAVE_AGENT_CONNECTION_FILE: f.agent.file }, stderr: 'pipe' });
   const mcp = new Client({ name: 'subwave-protocol-test', version: '1' });
   await mcp.connect(transport); t.after(() => mcp.close());
-  const catalog = await mcp.listTools(); assert.equal(catalog.tools.length, 21);
+  const catalog = await mcp.listTools(); assert.equal(catalog.tools.length, 25);
   const result = await mcp.callTool({ name: 'subwave_search_library', arguments: { query: 'Alpha' } });
   assert.equal(result.structuredContent.tracks[0].id, f.trackA.id);
   assert.equal(result.isError, undefined);

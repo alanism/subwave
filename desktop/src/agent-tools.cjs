@@ -23,7 +23,7 @@ function publicJob(job) {
 define('status', 'Read the actual desktop playback state, selected collection and local library counts. Subwave must be open.', {}, true, async c => {
   const [library, playback, now] = await Promise.all([c.api('GET', '/local/library'), c.player('status', {}), c.api('GET', '/now-playing')]);
   return { playback, selected: library.selected, trackCount: library.allTracks.length,
-    stationCount: library.stations.length, playlistCount: library.playlists.filter(p => !p.deletedAt).length,
+    stationCount: library.stations.length, internetStationCount: library.internetStations?.length || 0, playlistCount: library.playlists.filter(p => !p.deletedAt).length,
     nowPlaying: now.nowPlaying, error: library.error };
 });
 define('search_library', 'Find existing local songs by title, artist or genre. Return exact track IDs for playback or adding to a playlist.',
@@ -36,7 +36,17 @@ define('search_library', 'Find existing local songs by title, artist or genre. R
     return { tracks: found.slice(0, a.limit), total: found.length };
   });
 define('list_stations', 'List separate local genre stations, their IDs and track counts. All music is an aggregate view.', {}, true,
-  async c => { const v = await c.api('GET', '/local/library'); return { selected: v.selected, stations: v.stations }; });
+  async c => { const v = await c.api('GET', '/local/library'); return { selected: v.selected, stations: v.stations, internetStations:v.internetStations || [] }; });
+define('search_radio', 'Search the live Radio Browser directory by station name, genre and country. Does not save a preset or start playback.',
+  { name:z.string().trim().max(120).default(''), genre:z.string().trim().max(80).default(''), country:z.string().trim().max(80).default(''), offset:z.number().int().min(0).max(3000).default(0) }, true,
+  (c,a)=>c.api('POST','/local/radio/search',a));
+define('list_radio_presets', 'List saved live internet-radio presets and exact source IDs for tuning. Local genres are listed separately by list_stations.', {}, true,
+  async c=>{const v=await c.api('GET','/local/library');return {selected:v.selected,presets:v.internetStations || []};});
+define('save_radio_preset', 'Save a selected public audio stream as an internet-radio preset without starting playback. Prefer a result from search_radio.',
+  { name:string(120),url:string(2048),country:z.string().max(80).default(''),tags:z.string().max(300).default(''),codec:z.string().max(30).default(''),providerId:z.string().max(80).default('') }, false,
+  (c,a)=>c.api('POST','/local/radio/presets',a));
+define('remove_radio_preset', 'Remove one explicitly chosen saved radio preset. Does not delete local audio. If selected, playback is stopped.',
+  { sourceId:z.string().regex(/^net-[a-f0-9]{16}$/) }, false,async(c,a)=>{const v=await c.api('GET','/local/library');if(v.selected===a.sourceId)await c.player('stop',{});return c.api('DELETE',`/local/radio/presets/${a.sourceId}`,{});});
 define('search_youtube', 'Search YouTube without downloading. Inspect title, uploader, duration and video URL before choosing the intended recording.',
   { query: string(200) }, true, (c, a) => c.api('POST', '/youtube/search', a));
 define('download_youtube', 'Queue one chosen YouTube video URL as a retained MP3. Returns a job, not a completed download. Poll subwave_download_status. Does not start playback.',
@@ -68,18 +78,18 @@ define('update_playlist', 'Replace the complete playlist name and ordered track 
   (c, a) => c.api('PUT', `/local/playlists/${a.playlistId}`, { name: a.name, trackIds: a.trackIds }));
 define('play_track', 'Play an exact local track in the actual native player. Returns observed audio state, not just a queued selection.', { trackId }, false,
   (c, a) => c.player('play-track', a));
-define('play_station', 'Select and play a non-empty genre station or ordered playlist in the native window. Use an exact station/playlist ID.', { sourceId }, false,
+define('play_station', 'Select and play a genre station, ordered playlist or saved live internet-radio preset in the native window. Use an exact station/playlist ID.', { sourceId }, false,
   async (c, a) => {
     const library = await c.api('GET', '/local/library');
-    const source = library.stations.find(s => s.id === a.sourceId) || library.playlists.find(p => p.id === a.sourceId && !p.deletedAt);
+    const source = library.stations.find(s => s.id === a.sourceId) || library.playlists.find(p => p.id === a.sourceId && !p.deletedAt) || library.internetStations?.find(p => p.id === a.sourceId);
     if (!source) throw new Error('Unknown collection. List stations or playlists and use an exact source ID.');
-    if (!source.count) throw new Error('This collection is empty. Add songs before playing it.');
+    if (!source.id.startsWith('net-') && !source.count) throw new Error('This collection is empty. Add songs before playing it.');
     return c.player('play-source', a);
   });
 define('play_download', 'Play a completed retained MP3 in the native window. If not yet in a genre, add it to Local files first.', { jobId }, false,
   (c, a) => c.player('play-download', a));
 define('stop', 'Stop actual native playback, including an earlier pending track selection.', {}, false, c => c.player('stop', {}));
-define('next', 'Advance the current collection. If stopped, remain stopped.', {}, false, c => c.player('next', {}));
+define('next', 'Advance the current collection. If stopped, remain stopped.', {}, false, async c => {const v=await c.api('GET','/local/library');if(v.internetStations?.some(row=>row.id===v.selected))throw new Error('Live radio cannot skip songs. Tune another saved station.');return c.player('next', {});});
 define('set_volume', 'Set the native player volume from 0 to 100. Zero silences playback. This is not the system output volume.',
   { volume: z.number().min(0).max(100) }, false, (c, a) => c.player('set-volume', a));
 

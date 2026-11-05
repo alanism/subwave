@@ -9,9 +9,9 @@ import { Spring } from './vendor/interaction';
 import type { Finish } from './SourceControls';
 
 type Props = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'ref'> & {
-  value: string; onChange: (value: string) => void; inputRef?: RefCallback<HTMLInputElement>; finish: Finish;
+  searchLabel?: string; value: string; onChange: (value: string) => void; inputRef?: RefCallback<HTMLInputElement>; finish: Finish;
 };
-export default function SourceSearch({ value, onChange, inputRef, finish, ...props }: Props) {
+export default function SourceSearch({ value, onChange, inputRef, finish, searchLabel = 'YouTube search', ...props }: Props) {
   const bar = useRef<HTMLDivElement>(null), field = useRef<HTMLDivElement>(null), ball = useRef<HTMLButtonElement>(null), input = useRef<HTMLInputElement>(null);
   const spring = useRef<Spring | null>(null);
   const [open, setOpen] = useState(false);
@@ -42,7 +42,7 @@ export default function SourceSearch({ value, onChange, inputRef, finish, ...pro
         tabIndex={open ? 0 : -1} value={value} onChange={e => onChange(e.target.value)}
         ref={element => { input.current = element; inputRef?.(element); }}
         onKeyDown={e => { if (e.key === 'Escape') { e.preventDefault(); setOpen(false); onChange(''); ball.current?.focus(); } }} /></div>
-      <button ref={ball} type="button" className={a.searchBall} aria-expanded={open} aria-label={open ? 'Close YouTube search' : 'Open YouTube search'} onClick={() => {
+      <button ref={ball} type="button" className={a.searchBall} aria-expanded={open} aria-label={`${open ? 'Close' : 'Open'} ${searchLabel}`} onClick={() => {
         setOpen(!open); if (open) onChange('');
       }}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6" /><path d="m15 15 4.5 4.5" /></svg></button>
     </div>

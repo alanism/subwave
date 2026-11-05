@@ -4,16 +4,17 @@ import { link, lstat, mkdir, readdir, unlink } from 'node:fs/promises';
 import { basename, extname, join } from 'node:path';
 import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
 import { LocalLibrary, DEFAULT_GENRES } from './library.js';
+import { radioUrl, searchInternetRadio, type OpenRadio } from './internet-radio.js';
 import { LocalRadio } from './radio.js';
 import { YoutubeImports, youtubeLibraryFolder } from '../../controller/src/music/youtube/service.js';
 import { runProcess, type RunProcess, type ProcessOptions } from '../../controller/src/music/youtube/process.js';
 import { youtubeAddSchema, youtubeDownloadSchema, youtubeRoutingSchema, youtubeSearchSchema } from '../../controller/src/schemas/youtube.js';
-import { desktopGenreCreateSchema, desktopPlaylistCreateSchema, desktopStationSelectSchema } from '../../controller/src/schemas/desktop-local.js';
+import { desktopGenreCreateSchema, desktopPlaylistCreateSchema, desktopStationSelectSchema, desktopInternetStationInputSchema, desktopRadioSearchSchema } from '../../controller/src/schemas/desktop-local.js';
 
 type Options = {
   stateDir: string; musicDir: string; token: string; port?: number;
   ffmpeg?: string; ffprobe?: string; ytDlp?: string; run?: RunProcess;
-  notify?: (message: Record<string, unknown>) => void; iconPath?: string;
+  notify?: (message: Record<string, unknown>) => void; iconPath?: string; openRadio?: OpenRadio;
 };
 const explain = (error: unknown) => {
   const code = (error as NodeJS.ErrnoException)?.code;
@@ -77,7 +78,7 @@ export async function startLocalStation(options: Options) {
   await library.scan();
   await youtube.resume();
   await library.scan();
-  radio = new LocalRadio(library, { ffmpeg, onSpawn, onExit });
+  radio = new LocalRadio(library, { ffmpeg, onSpawn, onExit, openRadio:options.openRadio });
   const tools = await youtube.tools();
   if (!tools.ytDlp.available || !tools.ffmpeg.available) throw new Error('The local station needs yt-dlp and FFmpeg. Install them before starting Subwave.');
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -203,6 +204,13 @@ export async function startLocalStation(options: Options) {
         if (route.startsWith('/cover/') && options.iconPath) { res.writeHead(200, { 'Content-Type': 'image/png', 'Cache-Control': 'private, max-age=3600' }); createReadStream(options.iconPath).pipe(res); return; }
       }
       const value = await body(req);
+      if (method === 'POST' && route === '/local/radio/search') { json(res, await searchInternetRadio(desktopRadioSearchSchema.parse(value), options.openRadio)); return; }
+      if (method === 'POST' && route === '/local/radio/presets') {
+        const input=desktopInternetStationInputSchema.parse(value); radioUrl(input.url);
+        json(res,await serialize(async()=>({station:await library.saveInternetStation(input),...library.view()})));return;
+      }
+      const preset=/^\/local\/radio\/presets\/(net-[a-f0-9]{16})$/.exec(route);
+      if (method === 'DELETE' && preset) { json(res,await serialize(async()=>{const active=library.selected===preset[1];await library.removeInternetStation(preset[1]!);if(active)await radio!.select('all');return library.view();}));return; }
       if (method === 'POST' && route === '/youtube/search') { json(res, { videos: await youtube.search(youtubeSearchSchema.parse(value)) }); return; }
       if (method === 'POST' && route === '/youtube/downloads') { json(res, { job: await youtube.enqueue(youtubeDownloadSchema.parse(value)) }, 202); return; }
       const jobAction = /^\/youtube\/downloads\/([a-f0-9-]{36})\/(add|retry)$/.exec(route);
@@ -235,7 +243,7 @@ export async function startLocalStation(options: Options) {
         const result = await serialize(async () => {
           if (library.routes.length >= 8) throw new Error('You can use up to eight genre stations');
           let id = input.name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 32) || `genre-${randomUUID().slice(0, 8)}`;
-          if (id === 'all' || /^pl-[a-f0-9]{8}$/.test(id)) id = `genre-${id}`;
+          if (id === 'all' || /^pl-[a-f0-9]{8}$/.test(id) || id.startsWith('net-')) id = `genre-${id}`;
           if (library.routes.some(row => row.stationId === id)) id += `-${randomUUID().slice(0, 6)}`;
           await youtubeLibraryFolder(library.root, id); await staging(id);
           pendingStations.add(id);
@@ -256,6 +264,7 @@ export async function startLocalStation(options: Options) {
         await library.trashPlaylist(playlist[1]!, !!playlist[2]); if (active) await radio!.select('all'); return library.view();
       })); return; }
       if (method === 'POST' && route === '/local/next') {
+        if(library.internetStation())throw new Error('Live radio cannot skip songs. Tune to another station instead.');
         json(res, await serialize(async () => { const next = radio!.upcoming()[0] || library.tracksFor()[0]; if (next) await radio!.request(next.id); return { ok: true }; })); return;
       }
       const play = /^\/local\/tracks\/([a-f0-9]{32})\/play$/.exec(route);
@@ -314,3 +323,5 @@ if (process.env.SUBWAVE_LOCAL_BOOT === '1') {
     else process.on('message', command);
   }).catch(error => { killWorkerChildren(); send({ type: 'failed', error: explain(error) }); console.error(explain(error)); process.exit(1); });
 }
+
+export { publicAddress, radioUrl, icyAudio, openPublicRadio } from './internet-radio.js';

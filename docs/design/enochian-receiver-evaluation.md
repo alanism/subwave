@@ -116,3 +116,7 @@ The README includes a clean installed-app screenshot. Additional window/finish e
 ## Follow-on: tuning and visualization, 1.3.1 (2026-11-06)
 
 The numerical design assessment above records 1.3.0. Version 1.3.1 adds the authored Radio Tuner and reuses Original's actual spectrum painter inside the receiver screen. New channel-selection, release/glide, Stop, motion-preference, skin-switch and native-agent checks have separate evidence. The README screenshots now show 1.3.1. The frozen rubric anchors and historical scores are unchanged; no new visual score is inferred from the extra passing tests.
+
+## Follow-on: live internet radio, 1.4.0 (2026-11-06)
+
+The frozen 1.3.0 scores remain historical. Version 1.4.0 adds a seventh authored Radio key and saved internet presets to the same left knob/aperture scale; it retains the existing receiver composition, source assets and Original spectrum. Separate verification covers real directory search, public stream decoding, volume/mute, local/live source switching with one audio node, preset removal/Undo, unavailable-station recovery, restart persistence and 25 packaged MCP tools. General panels pass 48 native size/zoom/skin cases plus eight receiver-finish cases; populated radio results have another eight cases. These functional/layout checks do not assign a new aesthetic score or imply owner acceptance.

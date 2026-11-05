@@ -1,8 +1,8 @@
 # Subwave owner’s manual
 
-**Linux desktop edition · version 1.3.1 · Original + Enochian**
+**Linux desktop edition · version 1.4.0 · Original + Enochian**
 
-Subwave plays music saved on your computer. It also searches YouTube, downloads MP3s and organizes them into separate genre radio stations. Your local station starts with the app. You do not need an admin login or a separately configured server.
+Subwave plays music saved on your computer. It also searches YouTube, downloads MP3s and organizes them into separate genre radio stations. You can also listen to live internet radio. Your local station service starts with the app. You do not need an admin login or a separately configured server.
 
 ## Contents
 
@@ -12,6 +12,7 @@ Subwave plays music saved on your computer. It also searches YouTube, downloads 
 - [Play music](#play-music)
 - [Create and manage playlists](#create-and-manage-playlists)
 - [Use genre radio stations](#use-genre-radio-stations)
+- [Tune live internet radio](#tune-live-internet-radio)
 - [Search YouTube and keep an MP3](#search-youtube-and-keep-an-mp3)
 - [Appearance and window controls](#appearance-and-window-controls)
 - [Keyboard controls](#keyboard-controls)
@@ -42,12 +43,13 @@ Opening a panel keeps music playing. **Close · Esc** returns to the player. **P
 
 ## Find your way around
 
-Original uses a top toolbar. Enochian puts the same actions on six small front-panel keys: **Open files, Library, Genres, YouTube, Next and Settings**. The native menus remain available in both skins. In Enochian, **Library** opens Library & Playlists and **Genres** opens Genre stations.
+Original uses a top toolbar. Enochian puts the same actions on seven small front-panel keys: **Open files, Library, Genres, YouTube, Radio, Next and Settings**. The native menus remain available in both skins. In Enochian, **Library** opens Library & Playlists and **Genres** opens Genre stations.
 
 | Area | What you do there |
 | --- | --- |
 | **SUB/WAVE LOCAL** | Return to the main player. |
 | **YouTube** | Search, download, assign a genre and save another MP3 copy. |
+| **Radio / Internet radio** | Search live stations, save presets and tune broadcasts. |
 | **Genre stations** | Choose a listening collection or create another genre station. |
 | **Library & Playlists** | Import/search music and create or edit playlists. |
 | **Open files** | Open the chooser using the current import destination. |
@@ -55,7 +57,7 @@ Original uses a top toolbar. Enochian puts the same actions on six small front-p
 
 **Player** opens the same areas and provides playback commands. **Skin** selects Original or Enochian. **View** controls zoom and fullscreen. **Help** opens your music folder, desktop log and version information.
 
-The selected playback collection appears in the status bar and, in Enochian, beside the **TUNING** knob and on the receiver display. Turn the left knob by dragging vertically; the source changes when you release it. With the knob focused, arrow keys select the next/previous station or playlist, Home selects the first and End selects the last. Empty collections stay selectable so you can add music to them. Choosing an **import destination** controls where files are added; it does not switch what is playing.
+The selected playback collection appears in the status bar and, in Enochian, beside the **TUNING** knob and on the receiver display. Turn the left knob by dragging vertically; the source changes when you release it. With the knob focused, arrow keys select the next/previous genre, playlist or saved internet station, Home selects the first and End selects the last. Empty collections stay selectable so you can add music to them. Choosing an **import destination** controls where files are added; it does not switch what is playing.
 
 ## Open and find local files
 
@@ -83,7 +85,7 @@ Choose **Play** beside a library track, **Play playlist** in a playlist editor, 
 
 Enochian’s **POWER** control starts or stops listening to the selected collection. Its indicator follows the listening state; the central screen reports **STOPPED**, **STARTING** or **PLAYING**. If the collection is empty, power opens Library so you can add music. Original exposes its player transport. **Ctrl+Space** provides Play / Stop in either skin.
 
-Choose **Next track** or press **Ctrl+Right** to advance. Next does not start music while stopped. If you stop during a pending track selection, playback stays stopped.
+Choose **Next track** or press **Ctrl+Right** to advance. Next does not start music while stopped. Live broadcasts cannot skip individual songs; use channel tuning to change stations. If you stop during a pending track selection, playback stays stopped.
 
 The desktop uses a continuous local radio stream. It does not expose a seek/scrub control or promise exact-position pause/resume. Changing sources reconnects playback to the chosen collection. Playlists run in their displayed order, then repeat.
 
@@ -95,11 +97,11 @@ The display reports the current song and playback state. Empty stations explain 
 
 ### Tune channels and read the receiver display
 
-Enochian's left **TUNING** knob and the sliding channel scale inside its screen select the same genre stations and playlists. The channel number describes its position in your current collection list.
+Enochian's left **TUNING** knob and the sliding channel scale inside its screen select the same genre stations, playlists and saved internet presets. The channel number describes its position in your current collection list.
 
 Drag the scale left/right; the printed scale moves behind the fixed red needle. Release to settle on a channel. A quick fling glides into a channel stop. Drag cancellation leaves the selected source unchanged. With the scale focused, arrows move one channel, Shift+arrows move five, Home/End reach the first/last, and Page Up/Down seek with wrapping at the ends. The tuner updates when you select a station or playlist elsewhere, including through an agent.
 
-Tuning while listening switches to that collection and keeps music playing when it contains tracks. Tuning while stopped keeps playback stopped. An empty channel shows **NO TRACKS** and power opens Library so you can add music.
+Tuning while listening switches to that collection and keeps music playing when the local collection contains tracks or the selected live preset is available. Tuning while stopped keeps playback stopped. An empty channel shows **NO TRACKS** and power opens Library so you can add music.
 
 The center screen also contains the **same spectrum visualization as Original**, driven by the current audio. The trace rests when playback stops. Reduced motion and Lite mode hold a resting trace while playback continues. Changing skins retains the same audio element and analyser, so visualization does not restart the song.
 
@@ -148,6 +150,23 @@ You can keep up to **eight genre stations**, including the initial five. All mus
 - In Library, expand **Copy an existing track to another genre**, choose the track and destination, then **Copy to genre**.
 
 Adding music does not switch playback. A genre copy preserves the source file and existing playlist memberships. The same song can belong to more than one genre.
+
+## Tune live internet radio
+
+1. Choose **Radio** on Enochian, **Internet radio** in Original, or **Player → Internet radio** (**Ctrl+I**).
+2. Enter a **Station name**, **Genre**, **Country**, or a combination. Country accepts a name or two-letter code, such as Vietnam, GB or US. Choose **Search stations**, or **Browse popular**.
+3. Choose **Save preset** to keep a station without starting it. Choose **Tune in** to save and play it now.
+4. Saved presets appear after your genres and active playlists on Enochian’s **TUNING** knob and sliding channel scale. Turn/drag to preview, then release to tune. Arrows move one channel; Home/End choose first/last; Page Up/Down wrap.
+
+The center display shows the station and **LIVE**. When the broadcaster supplies a track title, it replaces the station-only title. The Original audio-reactive spectrum, volume, mute and power work with the broadcast in both skins. A live stream has no track duration, seeking or Next-song action. Stopping stays stopped when tuning another station; **Tune in** explicitly starts playback.
+
+Under **Add a station by stream URL**, enter a preset name and the station’s direct public audio address, then choose **Save stream preset**. Use an audio stream URL rather than its homepage. Up to **200 presets** are saved in the profile. Saving the same directory station again updates its preset without adding another dial entry.
+
+Supported sources are direct MP3, AAC, OGG/Opus and FLAC streams and simple M3U/PLS playlists pointing to them. Adaptive HLS streams are unsupported and show guidance to choose a direct stream. Private-network addresses and URLs with embedded logins are rejected. Live radio needs internet access; this feature listens to broadcasts and does not record them.
+
+Choose **Remove preset** to remove a saved station. Removing the playing preset stops playback and selects All music; it keeps all local files. **Undo removal** restores the last removed preset while the panel remains open. Presets and the selected channel survive restarting Subwave.
+
+If a station goes offline, Subwave shows the error and retries with a delay. Choose **Retry** or tune another preset. A directory failure keeps saved presets and local music available; retry the search later. Discovery uses the community [Radio Browser directory](https://www.radio-browser.info/); broadcasters control stream availability and supplied metadata.
 
 ## Search YouTube and keep an MP3
 
@@ -208,6 +227,7 @@ Shortcuts apply while Subwave is the active application.
 | Mute / Unmute | Ctrl+M |
 | Genre stations | Ctrl+G |
 | YouTube downloads | Ctrl+J |
+| Internet radio | Ctrl+I |
 | Settings | Ctrl+, |
 | Original | Ctrl+Shift+1 |
 | Enochian | Ctrl+Shift+2 |
@@ -218,11 +238,11 @@ Use **Tab / Shift+Tab** to move between controls, **Enter** to submit forms and 
 
 ## Let Aya or Hermes control Subwave
 
-Keep Subwave open. Choose **Help → Agent controls (Aya / Hermes)** to open the local control page. It can search your library or YouTube, download MP3s, add songs to the selected genre, and operate the actual native player. Playback stays in Subwave; the page does not start a second audio player.
+Keep Subwave open. Choose **Help → Agent controls (Aya / Hermes)** to open the local control page. It can search your library, YouTube or live internet radio, save/tune radio presets, download MP3s, add songs to the selected genre, and operate the actual native player. Playback stays in Subwave; the page does not start a second audio player.
 
 Aya needs access to this connected computer through the OpenAI desktop app. Ask it to open the Subwave agent page or use the installed `subwave-agent` command. A dot running only on its cloud computer cannot use your local music service.
 
-Hermes uses the bundled MCP connection. Once connected, ask it to find a local song, search YouTube for a missing recording, add the MP3 to Jazz, build a playlist or change the player volume. New downloads are asynchronous: the agent should check the job until ready before claiming that a song was added or played.
+Hermes uses the bundled MCP connection. Once connected, ask it to find a local song, search YouTube for a missing recording, add the MP3 to Jazz, build a playlist tune a saved internet station or change the player volume. New downloads are asynchronous: the agent should check the job until ready before claiming that a song was added or played.
 
 The tools preserve downloaded originals and use the same genre/playlist rules as the app. Specify the intended recording if search results are ambiguous. For connection instructions and the complete tool catalog, see [Agent controls](docs/agents.md).
 

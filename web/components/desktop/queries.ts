@@ -2,12 +2,14 @@
 
 import { useAdminAuth } from '@/lib/adminAuth';
 import { adminJson, useAdminMutation, useAdminQuery } from '@/lib/admin-query';
-import type { DesktopLibrary } from '@/lib/schemas.generated';
+import type { DesktopLibrary, DesktopInternetStationInput } from '@/lib/schemas.generated';
 import { youtubeKeys } from '@/components/admin/youtube/queries';
 
 export const desktopKeys = { library: ['desktop', 'library'] as const };
 export type LocalCommand =
   | { kind: 'select'; id: string }
+  | { kind: 'save-radio'; station: DesktopInternetStationInput }
+  | { kind: 'remove-radio'; id: string }
   | { kind: 'play'; id: string }
   | { kind: 'play-download'; id: string }
   | { kind: 'copy'; id: string; stationId: string }
@@ -33,6 +35,8 @@ export function useLocalCommand() {
       let value: unknown = {};
       let method = 'POST';
       switch (command.kind) {
+        case 'save-radio': path = '/local/radio/presets'; value = command.station; break;
+        case 'remove-radio': path = `/local/radio/presets/${command.id}`; method = 'DELETE'; break;
         case 'select': path = '/local/stations/select'; value = { id: command.id }; break;
         case 'create-station': path = '/local/stations'; value = { name: command.name, genre: command.genre }; break;
         case 'create-playlist': path = '/local/playlists'; value = { name: command.name }; break;

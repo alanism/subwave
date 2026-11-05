@@ -4,7 +4,7 @@ import { basename, join, relative, sep } from 'node:path';
 import { createSerialFileWriter } from '../../controller/src/util/atomic-file.js';
 import { youtubeLibraryFolder } from '../../controller/src/music/youtube/service.js';
 import type { YoutubeRoute } from '../../controller/src/schemas/youtube.js';
-import { desktopPlaylistEditSchema, desktopPlaylistSchema, desktopTrackSchema, type DesktopLibrary, type DesktopTrack, type DesktopPlaylist } from '../../controller/src/schemas/desktop-local.js';
+import { desktopPlaylistEditSchema, desktopPlaylistSchema, desktopTrackSchema, desktopInternetStationSchema, type DesktopInternetStation, type DesktopInternetStationInput, type DesktopLibrary, type DesktopTrack, type DesktopPlaylist } from '../../controller/src/schemas/desktop-local.js';
 import type { RunProcess } from '../../controller/src/music/youtube/process.js';
 
 export const DEFAULT_GENRES: YoutubeRoute[] = [
@@ -15,7 +15,7 @@ export const DEFAULT_GENRES: YoutubeRoute[] = [
   { stationId: 'local-files', genre: 'Local files', aliases: [], folder: 'Local files' },
 ];
 type CachedTrack = { stamp: string; track: DesktopTrack };
-type Preferences = { selected: string; names: Record<string, string>; playlists: DesktopPlaylist[] };
+type Preferences = { selected: string; names: Record<string, string>; playlists: DesktopPlaylist[]; internetStations: DesktopInternetStation[] };
 type Options = { stateDir: string; musicDir: string; run: RunProcess; ffprobe: string; onChange?: () => void };
 
 export class LocalLibrary {
@@ -24,6 +24,7 @@ export class LocalLibrary {
   error: string | null = null;
   private names: Record<string, string> = {};
   private playlists: DesktopPlaylist[] = [];
+  private internetStations: DesktopInternetStation[] = [];
   private tracks: DesktopTrack[] = [];
   private files = new Map<string, string>();
   private cache: Record<string, CachedTrack> = {};
@@ -52,21 +53,22 @@ export class LocalLibrary {
     this.selected = typeof preferences.selected === 'string' ? preferences.selected : 'all';
     this.names = preferences.names && typeof preferences.names === 'object' ? Object.fromEntries(Object.entries(preferences.names).filter(([id, name]) => /^[a-z0-9-]{1,41}$/.test(id) && typeof name === 'string')) as Record<string, string> : {};
     this.playlists = Array.isArray(preferences.playlists) ? preferences.playlists.filter((p: unknown) => desktopPlaylistSchema.safeParse(p).success && /^pl-[a-f0-9]{8}$/.test((p as DesktopPlaylist).id)) : [];
+    this.internetStations = Array.isArray(preferences.internetStations) ? preferences.internetStations.filter((row: unknown) => desktopInternetStationSchema.safeParse(row).success).slice(0,200) : [];
     const cache = await read('catalog.json');
     this.cache = cache && typeof cache === 'object' ? cache : {};
   }
   setRoutes(routes: YoutubeRoute[]) {
     this.routes = structuredClone(routes);
-    if (this.selected !== 'all' && !routes.some(route => route.stationId === this.selected) && !this.playlists.some(p => p.id === this.selected && !p.deletedAt)) this.selected = 'all';
+    if (this.selected !== 'all' && !routes.some(route => route.stationId === this.selected) && !this.playlists.some(p => p.id === this.selected && !p.deletedAt) && !this.internetStation()) this.selected = 'all';
   }
   private changePreferences<T>(change: (current: Preferences) => { next: Preferences; result: T }): Promise<T> {
     const operation = this.preferencesChain.catch(() => {}).then(async () => {
-      const current = { selected: this.selected, names: this.names, playlists: this.playlists };
+      const current = { selected: this.selected, names: this.names, playlists: this.playlists, internetStations: this.internetStations };
       const { next, result } = change(current);
       // Publish memory only after the snapshot reaches disk. Every writer,
       // including an index scan, takes its snapshot inside this same queue.
       await this.savePreferences(JSON.stringify(next));
-      this.selected = next.selected; this.names = next.names; this.playlists = next.playlists;
+      this.selected = next.selected; this.names = next.names; this.playlists = next.playlists; this.internetStations = next.internetStations;
       return result;
     });
     this.preferencesChain = operation; return operation;
@@ -75,18 +77,33 @@ export class LocalLibrary {
   async setName(id: string, name: string) { await this.changePreferences(current => ({ next: { ...current, names: { ...current.names, [id]: name } }, result: undefined })); }
   async select(id: string) {
     await this.changePreferences(current => {
-      if (id !== 'all' && !this.routes.some(route => route.stationId === id) && !current.playlists.some(p => p.id === id && !p.deletedAt)) throw new Error('Station or playlist not found');
+      if (id !== 'all' && !this.routes.some(route => route.stationId === id) && !current.playlists.some(p => p.id === id && !p.deletedAt) && !current.internetStations.some(row => row.id === id)) throw new Error('Station or playlist not found');
       return { next: { ...current, selected: id }, result: undefined };
     });
     this.options.onChange?.();
   }
   stationName(id = this.selected) {
     if (id === 'all') return 'All music';
+    const internet = this.internetStation(id); if (internet) return internet.name;
     const playlist = this.playlists.find(p => p.id === id && !p.deletedAt);
     if (playlist) return playlist.name;
     const label = this.routes.find(route => route.stationId === id)?.displayName;
     if (label) return label;
     return typeof this.names[id] === 'string' ? this.names[id] : `${this.routes.find(route => route.stationId === id)?.genre || id} Radio`;
+  }
+  internetStation(id = this.selected) { return this.internetStations.find(row => row.id === id) || null; }
+  async saveInternetStation(input: DesktopInternetStationInput) {
+    const id = `net-${createHash('sha256').update(input.providerId || input.url).digest('hex').slice(0,16)}`;
+    const station = desktopInternetStationSchema.parse({ ...input, id });
+    await this.changePreferences(current => {
+      if (current.internetStations.length >= 200 && !current.internetStations.some(row => row.id === id)) throw new Error('You can save up to 200 radio presets.');
+      return { next: { ...current, internetStations: current.internetStations.some(row => row.id === id) ? current.internetStations.map(row => row.id === id ? station : row) : [...current.internetStations,station] }, result: undefined };
+    });
+    this.options.onChange?.(); return station;
+  }
+  async removeInternetStation(id: string) {
+    await this.changePreferences(current => ({ next: { ...current, selected: current.selected === id ? 'all' : current.selected, internetStations: current.internetStations.filter(row => row.id !== id) }, result: undefined }));
+    this.options.onChange?.();
   }
   tracksFor(id = this.selected): DesktopTrack[] {
     const playlist = this.playlists.find(p => p.id === id && !p.deletedAt);
@@ -106,7 +123,7 @@ export class LocalLibrary {
       stations: [{ id: 'all', name: 'All music', genre: 'All genres', count: this.tracksFor('all').length },
         ...this.routes.map(route => ({ id: route.stationId, name: this.stationName(route.stationId), genre: route.genre, count: this.tracksFor(route.stationId).length }))],
       playlists: this.playlists.map(p => ({ ...p, count: p.trackIds.filter(id => this.files.has(id)).length })),
-      tracks: this.tracksFor(), allTracks: [...this.tracks],
+      internetStations: [...this.internetStations], tracks: this.tracksFor(), allTracks: [...this.tracks],
     };
   }
   async path(id: string): Promise<string> {

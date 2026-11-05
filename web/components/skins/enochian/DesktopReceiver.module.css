@@ -74,3 +74,5 @@
   .dialLabel strong { max-width:100px; font-size:10px; }
 }
 @media(max-height:560px) { .room { justify-content:flex-start; padding-top:28px; }.fineVolume { margin-top:18px; } }
+
+.displayBottom > span:first-child { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }.displayBottom > span:last-child { flex-shrink:0; }

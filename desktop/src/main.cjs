@@ -19,8 +19,8 @@ function log(event, detail = '') {
   try { appendFileSync(logPath, `${new Date().toISOString()} ${event} ${detail}\n`); } catch { /* do not prevent playback */ }
 }
 const config = new ConfigStore(join(dataDir, 'preferences.json'));
-const panels = new Set(['youtube', 'library', 'stations', 'settings']);
-const panelFromArgs = args => args.includes('--settings') ? 'settings' : args.includes('--youtube') ? 'youtube' : args.includes('--library') ? 'library' : args.includes('--stations') ? 'stations' : null;
+const panels = new Set(['youtube', 'library', 'stations', 'settings', 'radio']);
+const panelFromArgs = args => args.includes('--radio') ? 'radio' : args.includes('--settings') ? 'settings' : args.includes('--youtube') ? 'youtube' : args.includes('--library') ? 'library' : args.includes('--stations') ? 'stations' : null;
 let currentPanel = panelFromArgs(process.argv);
 let player, runtime, gateway, local, agent, musicDir, openingFiles, quitting = false, shutdownStarted = false;
 let agentReady = false;
@@ -113,6 +113,7 @@ function buildMenu() {
       { type: 'separator' },
       { label: 'Library', accelerator: 'CommandOrControl+L', click: () => showPanel('library') },
       { label: 'New playlist…', accelerator: 'CommandOrControl+N', enabled: !!local, click: () => playerCommand('new-playlist') },
+      { label: 'Internet radio', accelerator: 'CommandOrControl+I', click: () => showPanel('radio') },
       { label: 'Genre stations', accelerator: 'CommandOrControl+G', click: () => showPanel('stations') },
       { label: 'YouTube downloads', accelerator: 'CommandOrControl+J', click: () => showPanel('youtube') },
       { label: 'Settings', accelerator: 'CommandOrControl+,', click: () => showPanel('settings') },

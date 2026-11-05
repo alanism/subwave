@@ -1,8 +1,8 @@
 # Subwave for Linux
 
-**Your music, genre radio stations and YouTube downloads in one desktop player.**
+**Your music, genre stations, live internet radio and YouTube downloads in one desktop player.**
 
-Open Subwave from your Linux Apps menu. Its local music service starts with the player. Import audio, build an ordered playlist, or search YouTube and keep an MP3. Choose **Original** or **Enochian** for the player’s appearance.
+Open Subwave from your Linux Apps menu. Its local music service starts with the player. Import audio, build an ordered playlist, search YouTube and keep an MP3, or tune a live internet station. Choose **Original** or **Enochian** for the player’s appearance.
 
 This desktop edition is developed from [perminder-klair/subwave](https://github.com/perminder-klair/subwave). It starts without an account, admin login, station address, Docker or a separately configured radio server. The inherited web radio and server code remains in the repository; its setup is documented separately in [README.upstream.md](README.upstream.md).
 
@@ -12,11 +12,11 @@ This desktop edition is developed from [perminder-klair/subwave](https://github.
 
 ### Enochian
 
-The authored [Enochian Elements](https://uiux-nonhumanintelligence.web.app/UIUX) controls run from their source code: rotary knob, ribbed slider, inset display, AV receiver power control, switches, Input Selector keys and rolling search control. Layout and scale adapt to the app while preserving the controls’ materials, geometry and interaction behavior. The Linux player mounts these parts on one wide receiver chassis: input knob on the left, compact central display, volume on the right and small function keys below. The left knob and authored sliding Radio Tuner select actual genre stations and playlists. The center screen also carries the Original skin’s audio-reactive spectrum; the ribbed fine-volume slider opens below the receiver. Ivory and Obsidian are finishes of the same skin.
+The authored [Enochian Elements](https://uiux-nonhumanintelligence.web.app/UIUX) controls run from their source code: rotary knob, ribbed slider, inset display, AV receiver power control, switches, Input Selector keys and rolling search control. Layout and scale adapt to the app while preserving the controls’ materials, geometry and interaction behavior. The Linux player mounts these parts on one wide receiver chassis: input knob on the left, compact central display, volume on the right and small function keys below. The left knob and authored sliding Radio Tuner select actual genre stations, playlists and saved live-radio presets. The center screen also carries the Original skin’s audio-reactive spectrum; the ribbed fine-volume slider opens below the receiver. Ivory and Obsidian are finishes of the same skin.
 
 Receiver-specific design criteria: [Ryo Lu inspired rubric](docs/design/enochian-receiver-ryo-rubric.md), [Andy Allen inspired rubric](docs/design/enochian-receiver-andy-rubric.md) and [evaluation](docs/design/enochian-receiver-evaluation.md). Each rubric has twenty criteria with five explicit levels, grounded in the supplied JBL receiver references. They are project interpretations, not personal designer endorsements.
 
-![Enochian player with real local audio playing](docs/images/linux-enochian.png)
+![Enochian receiver playing live internet radio](docs/images/linux-enochian.png)
 
 [View the Obsidian finish](docs/images/linux-enochian-obsidian.png).
 
@@ -36,15 +36,16 @@ These are installed-app captures using an isolated test library. Changing skins 
 | Supported imports | MP3, FLAC, WAV, M4A and OGG are verified. The chooser also accepts Opus and AAC. Up to 50 files per import, each no larger than 250 MiB. |
 | Library | Search title, artist or genre; filter collections; refresh after file changes. |
 | Playlists | Create, rename, add/remove tracks, reorder, play in saved order, delete and restore. Playlists repeat after the last track. |
-| Receiver tuning | Authored sliding channel scale and left knob, with real genre/playlist selection, release-to-tune and keyboard seeking. |
+| Receiver tuning | Authored sliding channel scale and left knob, with real genre/playlist/live-preset selection, release-to-tune and keyboard seeking. |
 | Visualization | Original’s logarithmic spectrum in the receiver screen, driven by real audio; reduced motion and continuous playback across skins. |
+| Internet radio | Search Radio Browser by name, genre and country; save up to 200 presets or enter a direct stream URL. Tune with the same receiver dial, volume and visualization. |
 | Genre radio | Independent genre collections. Choose what plays or copy a track to another genre while keeping its original. |
 | YouTube | Search by song/artist or paste an individual video URL. Download real MP3s with visible job states and retry. |
 | Genre sorting | Match video tags, title and description to genre rules. Unclear matches wait for a manual destination. |
 | Recent downloads | Retain original YouTube MP3s after genre copies. Export another copy through the native save dialog. |
 | Desktop usability | Native menus, shortcuts, chooser/save dialogs, resizing, zoom and system media controls. |
-| Aya / Hermes | 21 shared tools for searching, downloads, genres, playlists and actual playback. Browser controls, JSON CLI and local stdio MCP. |
-| Local storage | Music and organization stay on the computer. Existing local music works offline; YouTube needs a connection. |
+| Aya / Hermes | 25 shared tools for searching, downloads, genres, playlists and actual playback. Browser controls, JSON CLI and local stdio MCP. |
+| Local storage | Music and organization stay on the computer. Existing local music works offline; YouTube and live radio need a connection. |
 
 Initial collections are **Jazz, House, Rock, Ambient and Local files**, plus an **All music** view. Create additional genres up to eight genre stations in total. A genre station is a local listening collection, independent of a YouTube uploader/channel.
 
@@ -57,6 +58,8 @@ On the configured Omarchy installation, open **Subwave** from **Apps**.
 3. Select your files. Choose **Play** beside a track, or choose **Play station** in **Genre stations**.
 
 For YouTube, open **YouTube**, enter a query or video URL, and choose **Download MP3**. Completed files appear in **Recent YT downloads**. Choose a genre and **Add to Subwave**, or use **Add & play**. **Save MP3** exports an extra copy.
+
+For live radio, open **Radio** (or **Player → Internet radio**, Ctrl+I), search by station name, genre or country, then **Save preset** or **Tune in**. Saved presets join local genres and playlists on the tuning dial. Direct MP3/AAC/OGG/FLAC streams and simple M3U/PLS playlists are supported; adaptive HLS is not. Live radio is listening only; it does not record broadcasts.
 
 For a portable build, keep **Start Subwave** beside its matching AppImage and launch the helper. It uses extract-and-run mode without requiring FUSE. Alternatively, extract the Linux tarball and run `subwave`. A portable launch alone does not register an Apps-menu entry.
 
@@ -122,7 +125,7 @@ Open **Subwave** from Apps. For updates, quit the app, build the new version and
 
 ## Agent control
 
-Desktop **1.2.0** adds **Help → Agent controls (Aya / Hermes)**, a local browser page backed by the same 21 tools as the bundled `subwave-agent` JSON/MCP helper. Agents can search existing songs or YouTube, download and inspect MP3 jobs, add genre copies, edit playlists, and control the real native player.
+Desktop **1.4.0** includes **Help → Agent controls (Aya / Hermes)**, a local browser page backed by the same 25 tools as the bundled `subwave-agent` JSON/MCP helper. Agents can search existing songs or YouTube, download and inspect MP3 jobs, add genre copies, edit playlists, search and save live radio presets, and control the real native player.
 
 Hermes connects through local stdio MCP. Aya, the OpenAI dot, uses the local page or command through its connected-computer access. See [setup, examples and the tool catalog](docs/agents.md). Keep Subwave open; local computer access is required for Aya to reach this installation.
 
@@ -146,7 +149,8 @@ Electron desktop window
   ├── Loopback gateway → bundled Next.js player
   └── Owned local station worker
         ├── File import, indexing and playlist persistence
-        ├── Independent genre collections
+        ├── Independent genre collections and saved live-radio presets
+        ├── Radio Browser discovery → public stream → local audio decoder
         ├── yt-dlp → retained MP3s and genre copies
         └── FFmpeg → local MP3 playback stream
 ```
@@ -166,9 +170,11 @@ The gateway and station bind to loopback. The gateway privately authorizes its o
 
 Usability work draws on [Apple’s desktop guidance](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos): predictable menus, keyboard access, focus return, native file flows, resizing and readable recovery. Both skins keep their own visual identity. The supplied Ryo Lu, Jayse Hansen, GMUNK and Satori references informed the internal design review.
 
-For desktop **1.2.1**, verification included 644 interface tests, 17 desktop/service/agent tests, five Enochian control/source checks and 40 native layout combinations across both skins, two sizes and 100%/125% zoom. Checks covered real encoded audio, persistence, recovery, MCP discovery/calls, the installed launcher and transport races. The exact installed agent helper completed live YouTube search → MP3 download → genre add → native playback → cold relaunch. Browser tools and their form fallback were exercised as well. Earlier physical chooser/save and shortcut checks include owner confirmations; current automated native dialog checks used controlled chooser/save return paths.
+Historical desktop **1.2.1** verification included 644 interface tests, 17 desktop/service/agent tests, five Enochian control/source checks and 40 native layout combinations across both skins, two sizes and 100%/125% zoom. Checks covered real encoded audio, persistence, recovery, MCP discovery/calls, the installed launcher and transport races. The exact installed agent helper completed live YouTube search → MP3 download → genre add → native playback → cold relaunch. Browser tools and their form fallback were exercised as well. Earlier physical chooser/save and shortcut checks include owner confirmations; current automated native dialog checks used controlled chooser/save return paths.
 
-The fixed internal 20-criterion, five-level evaluation reached **95/100**. This is a project assessment, not an endorsement by the people named in the references. It does not establish every Linux distribution’s compatibility or guarantee future YouTube availability.
+Desktop **1.4.0** adds live discovery, persistent presets, direct-stream decoding and four radio agent tools. Verification covers 648 interface tests, 20 desktop tests, the shared schema contract, 56 native window/finish/zoom layouts and eight populated radio-result layouts, actual public-radio decode and native playback, cold persistence, unavailable-station recovery and packaged MCP search/save/play/remove. Test profiles and silent audio output are isolated from the user library.
+
+The historical fixed internal 20-criterion, five-level usability evaluation reached **95/100**. This is a project assessment, not an endorsement by the people named in the references. It does not establish every Linux distribution’s compatibility or guarantee future YouTube availability.
 
 Before changing code, read [AGENTS.md](AGENTS.md) and the relevant component instructions. Run heavy builds/checks sequentially. Use each package’s `npm test` runner for isolated test state. Generate shared schema mirrors with the controller’s schema-generation command; do not edit the generated web mirror by hand.
 
@@ -177,6 +183,7 @@ Before changing code, read [AGENTS.md](AGENTS.md) and the relevant component ins
 - [Subwave](https://github.com/perminder-klair/subwave), by Parminder Klair and contributors — upstream project and Original player.
 - [Enochian Elements](https://uiux-nonhumanintelligence.web.app/UIUX) — authored control design and source supplied for this edition.
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp), [FFmpeg](https://ffmpeg.org/), [Electron](https://www.electronjs.org/) and [Next.js](https://nextjs.org/) — core tools and runtime.
+- [Radio Browser](https://www.radio-browser.info/) — community station directory; discovery uses its [official API](https://docs.radio-browser.info/). Station availability and metadata are provided by broadcasters and the community.
 - [CREDITS.md](CREDITS.md) — inherited project credits and dependency acknowledgments.
 
 The repository’s software license is [MIT](LICENSE); retain its copyright and license notices. Dependencies and assets retain their applicable licenses. Subwave does not supply a music catalog or grant rights to recordings. Use content you have permission to save.
