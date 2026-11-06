@@ -9,7 +9,8 @@ import { usePlayerActions, usePlayerAudio } from '@/components/player/PlayerCore
 import { useSkinSelection } from '@/components/skins/SkinContext';
 import { Button } from '@/components/ui/button';
 import type { DesktopAgentAction, DesktopCommand, DesktopPanel } from '@/lib/desktop';
-import type { DesktopLibrary } from '@/lib/schemas.generated';
+import type { DesktopLibrary, DesktopInternetStation, DesktopInternetStationInput } from '@/lib/schemas.generated';
+import { createPlaybackRequests } from '@/lib/playback-requests';
 import { hasPlayableSource, selectedInternetStation } from '@/lib/local-sources';
 import InternetRadioPanel from './InternetRadioPanel';
 import { DesktopContext } from './DesktopContext';
@@ -50,9 +51,9 @@ function Surface({ children }: { children: ReactNode }) {
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const focusReturn = useRef<HTMLElement | null>(null);
-  const playbackRequest = useRef(0);
-  const playbackTicket = () => ({ request: ++playbackRequest.current, intent: transportIntent.current });
-  const ticketCurrent = (ticket: ReturnType<typeof playbackTicket>) => ticket.request === playbackRequest.current && ticket.intent === transportIntent.current;
+  const [playbackRequests] = useState(() => createPlaybackRequests(transportIntent));
+  const playbackTicket = playbackRequests.begin;
+  const ticketCurrent = playbackRequests.isCurrent;
   const playerButton = useRef<HTMLButtonElement>(null);
   const openPanel = useCallback((next: DesktopPanel | null) => {
     if (next && document.activeElement instanceof HTMLElement && document.activeElement !== document.body && !document.activeElement.closest('[role="dialog"]')) focusReturn.current = document.activeElement;
@@ -138,6 +139,10 @@ function Surface({ children }: { children: ReactNode }) {
     stop(); play();
     setNotice('Selected track ready.');
   }
+  async function saveRadioPreset(station: DesktopInternetStationInput, start = false) {
+    const save = () => run({ kind: 'save-radio', station }, 'Radio preset saved. It is now on the tuning dial.') as Promise<{ station: DesktopInternetStation }>;
+    return start ? playbackRequests.run(save, result => selectSource(result.station.id, true)) : save();
+  }
   async function playDownload(id: string) {
     const ticket = playbackTicket();
     await run({ kind: 'play-download', id });
@@ -187,7 +192,7 @@ function Surface({ children }: { children: ReactNode }) {
   const source = library.data?.stations.find(s => s.id === library.data?.selected)?.name
     || library.data?.playlists.find(p => p.id === library.data?.selected)?.name || selectedInternetStation(library.data)?.name || 'Your local music';
   const visibleError = error || (library.error ? explain(library.error) : library.data?.error);
-  const context = { panel, openPanel, library, busy: command.isPending, pendingKind: command.isPending ? command.variables?.kind ?? null : null, importing, importDestination, setImportDestination, newPlaylistRequest, openFiles, run, selectSource, playTrack, playDownload };
+  const context = { panel, openPanel, library, busy: command.isPending, pendingKind: command.isPending ? command.variables?.kind ?? null : null, importing, importDestination, setImportDestination, newPlaylistRequest, openFiles, run, selectSource, saveRadioPreset, playTrack, playDownload };
   const operationStatus = command.isPending && command.variables ? operationLabels[command.variables.kind] : notice;
   return <DesktopContext.Provider value={context}>
     <div className={styles.surface} data-skin={skin?.effectiveId}>

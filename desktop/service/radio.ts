@@ -2,6 +2,7 @@ import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import type { ServerResponse } from 'node:http';
 import type { LocalLibrary } from './library.js';
 import { openAudioStream, openPublicRadio, icyAudio, type OpenRadio } from './internet-radio.js';
+import { nextRadioReconnect } from './radio-reconnect.js';
 import type { DesktopTrack } from '../../controller/src/schemas/desktop-local.js';
 
 type Options = { ffmpeg: string; onSpawn: (pid: number) => void; onExit: (pid: number) => void; openRadio?: OpenRadio };
@@ -148,6 +149,12 @@ export class LocalRadio {
       if (!this.closing && this.clients.size) this.advanceAfter(this.generation, 1500);
     } finally { if (this.starting === generation) this.starting = null; }
   }
+  private retryInternet(playedMs = 0) {
+    const retry = nextRadioReconnect(this.remoteFailures, playedMs);
+    this.remoteFailures = retry.failures;
+    this.stopTrack();
+    if (!this.closing && this.clients.size) this.advanceAfter(this.generation, retry.delay);
+  }
   private async nextInternet() {
     const station = this.library.internetStation();
     if (!station || this.closing || !this.clients.size) return;
@@ -164,7 +171,7 @@ export class LocalRadio {
       this.startedAt = null;
       child.once('spawn',()=>{if(child.pid)this.options.onSpawn(child.pid);});
       child.stdin.on('error',()=>{});
-      let output = false;
+      let output = false, outputAt = 0;
       const deadline = setTimeout(()=>{if(!output && generation===this.generation){this.error='This station did not send playable audio. Retry or choose another station.';abort.abort();child.kill();}},15_000);
       source.once('error',()=>{if(generation===this.generation){this.error='The station connection was interrupted. Retrying…';child.stdin.destroy();child.kill();}});
       const interval = Number(source.headers['icy-metaint']);
@@ -174,7 +181,7 @@ export class LocalRadio {
       child.stderr.on('data',()=>{});
       child.stdout.on('data',(chunk: Buffer)=>{
         if(generation!==this.generation)return;
-        if(!output){output=true;clearTimeout(deadline);this.startedAt=new Date().toISOString();this.error=null;this.remoteFailures=0;}
+        if(!output){output=true;outputAt=performance.now();clearTimeout(deadline);this.startedAt=new Date().toISOString();this.error=null;}
         this.burst.push(chunk);this.burstBytes+=chunk.length;
         while(this.burstBytes>12_000 && this.burst.length>1)this.burstBytes-=this.burst.shift()!.length;
         for(const client of this.clients){if(client.writableLength>256_000)client.destroy();else client.write(chunk);}
@@ -184,14 +191,12 @@ export class LocalRadio {
         clearTimeout(deadline);source.destroy();if(child.pid)this.options.onExit(child.pid);
         if(generation!==this.generation)return;
         this.error ||= 'The live station disconnected. Retrying…';
-        this.process=null;this.stopTrack();
-        if(!this.closing && this.clients.size)this.advanceAfter(this.generation,Math.min(30_000,5000*2**this.remoteFailures++));
+        this.process=null;this.retryInternet(output ? performance.now()-outputAt : 0);
       });
     } catch(error) {
       if(generation!==this.generation || this.closing)return;
       this.error=error instanceof Error?error.message:'This radio station could not be reached.';
-      this.stopTrack();
-      if(this.clients.size)this.advanceAfter(this.generation,Math.min(30_000,5000*2**this.remoteFailures++));
+      this.retryInternet();
     } finally {if(this.starting===generation)this.starting=null;}
   }
   close() { this.closing = true; clearTimeout(this.stopTimer); this.stopTrack(); for (const res of this.clients) res.end(); this.clients.clear(); }

@@ -43,8 +43,7 @@ export default function InternetRadioPanel() {
     setActionError('');
     const from = document.activeElement, row = from?.closest('li'), form = from?.closest('form');
     try {
-      const result = await desktop.run({kind:'save-radio',station},'Radio preset saved. It is now on the tuning dial.') as { station:{id:string} };
-      if(play)await desktop.selectSource(result.station.id,true);
+      await desktop.saveRadioPreset(station,play);
       setReturnFocus({from,target:()=>row?.querySelector<HTMLElement>('button:not(:disabled)') || form?.querySelector<HTMLElement>('input:not(:disabled)') || presetHeading.current});
       return true;
     }catch(error){setActionError(error instanceof Error?error.message:String(error));return false;}

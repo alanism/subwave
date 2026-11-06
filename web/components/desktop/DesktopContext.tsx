@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react';
 import type { UseQueryResult } from '@tanstack/react-query';
-import type { DesktopLibrary } from '@/lib/schemas.generated';
+import type { DesktopLibrary, DesktopInternetStation, DesktopInternetStationInput } from '@/lib/schemas.generated';
 import type { DesktopPanel } from '@/lib/desktop';
 import type { LocalCommand } from './queries';
 
@@ -19,6 +19,7 @@ export interface DesktopSurfaceContext {
   openFiles: (stationId?: string) => Promise<void>;
   run: (command: LocalCommand, success?: string) => Promise<unknown>;
   selectSource: (id: string, start?: boolean) => Promise<void>;
+  saveRadioPreset: (station: DesktopInternetStationInput, start?: boolean) => Promise<{ station: DesktopInternetStation }>;
   playTrack: (id: string) => Promise<void>;
   playDownload: (id: string) => Promise<void>;
 }

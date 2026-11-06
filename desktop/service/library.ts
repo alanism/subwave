@@ -6,6 +6,7 @@ import { youtubeLibraryFolder } from '../../controller/src/music/youtube/service
 import type { YoutubeRoute } from '../../controller/src/schemas/youtube.js';
 import { desktopPlaylistEditSchema, desktopPlaylistSchema, desktopTrackSchema, desktopInternetStationSchema, type DesktopInternetStation, type DesktopInternetStationInput, type DesktopLibrary, type DesktopTrack, type DesktopPlaylist } from '../../controller/src/schemas/desktop-local.js';
 import type { RunProcess } from '../../controller/src/music/youtube/process.js';
+import { readSavedLibrary } from './library-state.js';
 
 export const DEFAULT_GENRES: YoutubeRoute[] = [
   { stationId: 'jazz', genre: 'Jazz', aliases: ['bebop', 'hard bop', 'swing'], folder: 'Jazz' },
@@ -21,7 +22,10 @@ type Options = { stateDir: string; musicDir: string; run: RunProcess; ffprobe: s
 export class LocalLibrary {
   routes: YoutubeRoute[] = [];
   selected = 'all';
-  error: string | null = null;
+  private indexError: string | null = null;
+  private preferenceWarning: string | null = null;
+  private preferenceWriteBlocked: string | null = null;
+  get error() { return [this.preferenceWarning, this.indexError].filter(Boolean).join(' ') || null; }
   private names: Record<string, string> = {};
   private playlists: DesktopPlaylist[] = [];
   private internetStations: DesktopInternetStation[] = [];
@@ -44,17 +48,19 @@ export class LocalLibrary {
     await mkdir(this.options.stateDir, { recursive: true, mode: 0o700 });
     await mkdir(this.root, { recursive: true, mode: 0o700 });
     await mkdir(this.downloadsDir, { recursive: true, mode: 0o700 });
-    const read = async (name: string) => {
-      try { return JSON.parse(await readFile(join(this.options.stateDir, name), 'utf8')); }
-      catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') console.warn(`Could not read ${name}; rebuilding local library index.`); return {}; }
+    const readCatalog = async () => {
+      try { return JSON.parse(await readFile(join(this.options.stateDir, 'catalog.json'), 'utf8')); }
+      catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') console.warn('Could not read catalog.json; rebuilding local library index.'); return {}; }
     };
-    const loaded = await read('library.json');
-    const preferences = loaded && typeof loaded === 'object' && !Array.isArray(loaded) ? loaded : {};
+    const saved = await readSavedLibrary(this.options.stateDir);
+    const preferences = saved.value;
+    this.preferenceWarning = saved.warning; this.preferenceWriteBlocked = saved.writeBlocked;
+    if (saved.warning) console.warn(saved.warning);
     this.selected = typeof preferences.selected === 'string' ? preferences.selected : 'all';
     this.names = preferences.names && typeof preferences.names === 'object' ? Object.fromEntries(Object.entries(preferences.names).filter(([id, name]) => /^[a-z0-9-]{1,41}$/.test(id) && typeof name === 'string')) as Record<string, string> : {};
-    this.playlists = Array.isArray(preferences.playlists) ? preferences.playlists.filter((p: unknown) => desktopPlaylistSchema.safeParse(p).success && /^pl-[a-f0-9]{8}$/.test((p as DesktopPlaylist).id)) : [];
-    this.internetStations = Array.isArray(preferences.internetStations) ? preferences.internetStations.filter((row: unknown) => desktopInternetStationSchema.safeParse(row).success).slice(0,200) : [];
-    const cache = await read('catalog.json');
+    this.playlists = Array.isArray(preferences.playlists) ? preferences.playlists.filter((p: unknown): p is DesktopPlaylist => desktopPlaylistSchema.safeParse(p).success && /^pl-[a-f0-9]{8}$/.test((p as DesktopPlaylist).id)) : [];
+    this.internetStations = Array.isArray(preferences.internetStations) ? preferences.internetStations.filter((row: unknown): row is DesktopInternetStation => desktopInternetStationSchema.safeParse(row).success).slice(0,200) : [];
+    const cache = await readCatalog();
     this.cache = cache && typeof cache === 'object' ? cache : {};
   }
   setRoutes(routes: YoutubeRoute[]) {
@@ -63,6 +69,7 @@ export class LocalLibrary {
   }
   private changePreferences<T>(change: (current: Preferences) => { next: Preferences; result: T }): Promise<T> {
     const operation = this.preferencesChain.catch(() => {}).then(async () => {
+      if (this.preferenceWriteBlocked) throw new Error(this.preferenceWriteBlocked);
       const current = { selected: this.selected, names: this.names, playlists: this.playlists, internetStations: this.internetStations };
       const { next, result } = change(current);
       // Publish memory only after the snapshot reaches disk. Every writer,
@@ -73,7 +80,11 @@ export class LocalLibrary {
     });
     this.preferencesChain = operation; return operation;
   }
-  async remember() { await this.changePreferences(current => ({ next: current, result: undefined })); }
+  async remember() {
+    // Boot, scans and shutdown must not turn an unreadable preference file
+    // into a fresh empty one. Explicit edits fail with the recovery message.
+    if (!this.preferenceWriteBlocked) await this.changePreferences(current => ({ next: current, result: undefined }));
+  }
   async setName(id: string, name: string) { await this.changePreferences(current => ({ next: { ...current, names: { ...current.names, [id]: name } }, result: undefined })); }
   async select(id: string) {
     await this.changePreferences(current => {
@@ -233,7 +244,7 @@ export class LocalLibrary {
     }
     tracks.sort((a, b) => a.title.localeCompare(b.title) || a.id.localeCompare(b.id));
     this.tracks = tracks; this.files = files; this.cache = cache;
-    this.error = unreadable ? `${unreadable} audio file${unreadable === 1 ? ' could' : 's could'} not be read. Your other songs are available.` : null;
+    this.indexError = unreadable ? `${unreadable} audio file${unreadable === 1 ? ' could' : 's could'} not be read. Your other songs are available.` : null;
     await this.saveCache(JSON.stringify(cache));
     await this.remember(); this.options.onChange?.();
   }

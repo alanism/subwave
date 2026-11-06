@@ -1,6 +1,6 @@
 # Subwave owner’s manual
 
-**Linux desktop edition · version 1.4.0 · Original + Enochian**
+**Linux desktop edition · version 1.4.1 · Original + Enochian**
 
 Subwave plays music saved on your computer. It also searches YouTube, downloads MP3s and organizes them into separate genre radio stations. You can also listen to live internet radio. Your local station service starts with the app. You do not need an admin login or a separately configured server.
 
@@ -85,7 +85,7 @@ Choose **Play** beside a library track, **Play playlist** in a playlist editor, 
 
 Enochian’s **POWER** control starts or stops listening to the selected collection. Its indicator follows the listening state; the central screen reports **STOPPED**, **STARTING** or **PLAYING**. If the collection is empty, power opens Library so you can add music. Original exposes its player transport. **Ctrl+Space** provides Play / Stop in either skin.
 
-Choose **Next track** or press **Ctrl+Right** to advance. Next does not start music while stopped. Live broadcasts cannot skip individual songs; use channel tuning to change stations. If you stop during a pending track selection, playback stays stopped.
+Choose **Next track** or press **Ctrl+Right** to advance. Next does not start music while stopped. Live broadcasts cannot skip individual songs; use channel tuning to change stations. If you stop during a pending track selection or a search result’s preset save, playback stays stopped.
 
 The desktop uses a continuous local radio stream. It does not expose a seek/scrub control or promise exact-position pause/resume. Changing sources reconnects playback to the chosen collection. Playlists run in their displayed order, then repeat.
 
@@ -166,7 +166,7 @@ Supported sources are direct MP3, AAC, OGG/Opus and FLAC streams and simple M3U/
 
 Choose **Remove preset** to remove a saved station. Removing the playing preset stops playback and selects All music; it keeps all local files. **Undo removal** restores the last removed preset while the panel remains open. Presets and the selected channel survive restarting Subwave.
 
-If a station goes offline, Subwave shows the error and retries with a delay. Choose **Retry** or tune another preset. A directory failure keeps saved presets and local music available; retry the search later. Discovery uses the community [Radio Browser directory](https://www.radio-browser.info/); broadcasters control stream availability and supplied metadata.
+If a station goes offline, Subwave shows the error and retries with a delay. Repeated brief connections back off from 5 to 30 seconds; stable playback resets that delay. Choose **Retry** or tune another preset. A directory failure keeps saved presets and local music available; retry the search later. Discovery uses the community [Radio Browser directory](https://www.radio-browser.info/); broadcasters control stream availability and supplied metadata.
 
 ## Search YouTube and keep an MP3
 
@@ -298,6 +298,8 @@ A different account or folder layout can leave old paths in records. This versio
 | Download failed | Read the error, check the network and choose **Retry download**. Removed/restricted videos may remain unavailable. |
 | Tools show Not available | Expand **Storage and setup details**. A new installation needs yt-dlp and FFmpeg/ffprobe. Ask the installation maintainer to install/update them; the verified Omarchy machine already has them. |
 | No automatic genre match | Filter **Needs a station**, choose a destination and **Add to Subwave**. Unclear matches wait for you. |
+| Saved library settings are damaged | Subwave keeps an exact recovery copy named `library-recovery-…json` in the profile’s `local-station` folder before rebuilding settings. Audio files remain. Restore organization from a known-good backup, or keep the recovery copy for repair. |
+| Saved settings cannot be read | Existing settings remain untouched and playlist/preset edits are blocked. Repair access or restore the profile backup, then restart Subwave. |
 | Playlist/copy fails to save | Check free disk space and write access to music/profile folders, then retry. Failed operations are not reported as saved. |
 | Cramped panel | Scroll, enlarge the window or use **View → Reset zoom**. |
 | Local service/interface stops | Close and reopen. If it repeats, use **Help → Open desktop logs** and keep the error text. |

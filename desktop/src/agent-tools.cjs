@@ -10,6 +10,10 @@ const jobId = z.string().uuid();
 const playlistId = z.string().regex(/^pl-[a-f0-9]{8}$/);
 const limit = z.number().int().min(1).max(50).default(20);
 const object = shape => z.strictObject(shape);
+// Discovery describes behavior, rather than guessing capabilities from a
+// name. A saved live source can reach a broadcaster through play_station.
+const openWorldTools = new Set(['search_youtube', 'download_youtube', 'retry_download', 'search_radio', 'play_station']);
+const destructiveTools = new Set(['update_playlist', 'remove_radio_preset']);
 const tools = [];
 function define(name, description, shape, readOnly, run) {
   tools.push({ name: `subwave_${name}`, description, input: object(shape), readOnly, run });
@@ -97,8 +101,8 @@ function listTools() {
   return tools.map(t => {
     const inputSchema = z.toJSONSchema(t.input, { io: 'input' }); delete inputSchema.$schema;
     return { name: t.name, description: t.description, inputSchema,
-      annotations: { readOnlyHint: t.readOnly, destructiveHint: t.name === 'subwave_update_playlist',
-        openWorldHint: /youtube|download/.test(t.name) } };
+      annotations: { readOnlyHint: t.readOnly, destructiveHint: destructiveTools.has(t.name.slice('subwave_'.length)),
+        openWorldHint: openWorldTools.has(t.name.slice('subwave_'.length)) } };
   });
 }
 async function callTool(context, name, args) {

@@ -10,6 +10,17 @@ const { startGateway } = require('../src/gateway.cjs');
 const tools = require('../src/agent-tools.cjs');
 const client = require('../src/agent-client.cjs');
 
+test('agent discovery identifies live-radio network access and preset removal accurately', () => {
+  const catalog = new Map(tools.listTools().map(tool => [tool.name, tool.annotations]));
+  assert.equal(catalog.get('subwave_search_radio').openWorldHint, true);
+  assert.equal(catalog.get('subwave_play_station').openWorldHint, true);
+  assert.equal(catalog.get('subwave_remove_radio_preset').destructiveHint, true);
+  assert.equal(catalog.get('subwave_status').readOnlyHint, true);
+  assert.equal(catalog.get('subwave_status').openWorldHint, false);
+  assert.equal(catalog.get('subwave_download_status').openWorldHint, false);
+  assert.equal(catalog.get('subwave_add_download').openWorldHint, false);
+});
+
 async function fixture(t) {
   const dir = await mkdtemp(join(tmpdir(), 'subwave-agent-'));
   const trackA = { id: 'a'.repeat(32), stationId: 'jazz', title: 'First song', artist: 'Alpha', genre: 'Jazz', duration: 4, filename: 'a.mp3' };

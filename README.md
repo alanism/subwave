@@ -176,6 +176,8 @@ Desktop **1.4.0** adds live discovery, persistent presets, direct-stream decodin
 
 The historical fixed internal 20-criterion, five-level usability evaluation reached **95/100**. This is a project assessment, not an endorsement by the people named in the references. It does not establish every Linux distribution’s compatibility or guarantee future YouTube availability.
 
+Desktop **1.4.1** fixes a late Tune in after Stop, protects unreadable/damaged saved-library settings, preserves reconnect backoff across brief radio decodes, and corrects agent discovery hints. Playback intent, settings recovery and reconnect decisions live in small tested modules. The desktop test runner rebuilds the service before testing; desktop lint checks its TypeScript as well as JavaScript. The regression pass includes 651 web/player tests, 28 desktop tests and 22 shared YouTube tests, plus the query audit.
+
 Before changing code, read [AGENTS.md](AGENTS.md) and the relevant component instructions. Run heavy builds/checks sequentially. Use each package’s `npm test` runner for isolated test state. Generate shared schema mirrors with the controller’s schema-generation command; do not edit the generated web mirror by hand.
 
 ## Credits and license

@@ -86,6 +86,8 @@ npm --prefix web run lint
 npm run desktop:build
 ```
 
+`npm --prefix desktop test` rebuilds the service from current source before running tests, one file at a time. Add a substring to select files, for example `npm --prefix desktop test -- library-recovery`. Desktop lint also checks service and agent TypeScript with the compiler installed by `web ci`.
+
 Run heavy commands one at a time. The build bundles the local station service first, builds the interface into a separate `.next-desktop` directory, and produces the launch helper, AppImage and tar.gz in `desktop/dist/`. It includes local fonts and the four Original/Enochian palettes, strips local web environment files and preserves the regular web build. `npm run desktop` starts a prepared development build.
 
 The interface and station bind only to loopback. The desktop gateway privately authorizes requests to its owned station; the renderer has no Node access. Native file operations use a sender-checked bridge and the operating system's file/save dialogs. External links open in your browser. For isolated development verification, `SUBWAVE_DESKTOP_DATA_DIR` selects a separate application profile; the Music directory remains the system Music directory.

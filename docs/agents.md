@@ -1,6 +1,6 @@
 # Control Subwave with Aya, Hermes or another agent
 
-Desktop **1.4.0** exposes one catalog of 25 tools through three interfaces: a local browser page, a JSON command and standard MCP over stdio. They use the same library, download records, genre collections, saved live-radio presets and actual player as the native window. Keep Subwave open while using them.
+Desktop **1.4.1** exposes one catalog of 25 tools through three interfaces: a local browser page, a JSON command and standard MCP over stdio. They use the same library, download records, genre collections, saved live-radio presets and actual player as the native window. Keep Subwave open while using them.
 
 ## Aya — OpenAI dot
 
@@ -42,7 +42,7 @@ mcp_servers:
     args: [--mcp]
 ```
 
-After upgrading from 1.3.x, Hermes must reload MCP discovery to see the four new radio tools. For an existing Hermes conversation, use `/reload-mcp` or start a new conversation after connecting. See the [official Hermes MCP guide](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp).
+Version 1.4.1 also corrects discovery hints for radio network access, local download operations and preset removal. Reload MCP discovery after an upgrade to refresh those hints. After upgrading from 1.3.x, Hermes must reload MCP discovery to see the four new radio tools. For an existing Hermes conversation, use `/reload-mcp` or start a new conversation after connecting. See the [official Hermes MCP guide](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp).
 
 Example requests:
 

@@ -2,7 +2,7 @@
   "name": "subwave-desktop-enochian",
   "productName": "Subwave",
   "desktopName": "subwave.desktop",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Subwave Linux desktop player \u2014 Original and Enochian",
   "author": "Subwave contributors",
   "license": "MIT",
@@ -18,7 +18,7 @@
     "build": "npm run prepare:service && npm run prepare:web && electron-builder --linux AppImage tar.gz --x64 && node scripts/create-launcher.cjs",
     "pack": "npm run prepare:service && npm run prepare:web && electron-builder --linux --dir --x64",
     "lint": "node scripts/check.cjs",
-    "test": "node --test test/*.test.cjs"
+    "test": "node scripts/run-tests.cjs"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",

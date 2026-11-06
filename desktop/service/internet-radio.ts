@@ -1,9 +1,9 @@
 // Public internet-radio discovery and bounded, DNS-pinned HTTP streams. Remote
 // playlists/redirects never give FFmpeg access to the network or local files.
 import { request as httpRequest, type IncomingMessage } from 'node:http';
-import { request as httpsRequest } from 'node:https';
+import { request as httpsRequest, type RequestOptions } from 'node:https';
 import { lookup, resolve4, reverse } from 'node:dns/promises';
-import { BlockList, isIP } from 'node:net';
+import { BlockList, isIP, type TcpNetConnectOpts } from 'node:net';
 import { Transform } from 'node:stream';
 import { desktopInternetStationInputSchema, type DesktopInternetStationInput } from '../../controller/src/schemas/desktop-local.js';
 
@@ -39,11 +39,12 @@ export const openPublicRadio: OpenRadio = async (raw, signal) => {
       signal.throwIfAborted();
       try {
         response = await new Promise<IncomingMessage>((resolve,reject) => {
-          const request = (url.protocol === 'https:' ? httpsRequest : httpRequest)(url, {
+          const options: RequestOptions & Pick<TcpNetConnectOpts, 'autoSelectFamily'> = {
             agent:false, autoSelectFamily:false, family:address.family as 4|6, signal,
             headers:{ 'User-Agent':'Subwave/1.4 (Linux music player)', 'Icy-MetaData':'1', Accept:'*/*' },
             lookup: (_host,_options,callback) => callback(null,address.address,address.family),
-          }, resolve);
+          };
+          const request = (url.protocol === 'https:' ? httpsRequest : httpRequest)(url, options, resolve);
           request.once('error',reject);
           request.setTimeout(12_000,()=>request.destroy(new Error('The station stopped responding. Retry or choose another station.')));
           request.end();
